@@ -1,3 +1,5 @@
+import { ConsulRegistry } from "@pkg/consul";
+
 import { Repository } from "../../internal/repository/memory/memory.ts";
 import { Controller } from "../../internal/controller/customer/controller.ts";
 import { Handler } from "../../internal/handler/http/handler.ts";
@@ -36,3 +38,25 @@ function main(req: Request): Response {
 }
 
 Deno.serve({ port: 8000 }, main);
+
+const consulRegistry = new ConsulRegistry("http://192.168.56.104:8500");
+const instanceID = await consulRegistry.register("customer", "localhost", 8000);
+console.log(`Instance ID: ${instanceID}`);
+
+setInterval(async () => {
+  await consulRegistry.reportHealthyState();
+}, 1000)
+
+async function handleShutdown() {
+  await consulRegistry.deregister();
+
+  Deno.exit();
+}
+
+Deno.addSignalListener("SIGINT", handleShutdown);
+
+if (Deno.build.os === "windows") {
+  Deno.addSignalListener("SIGBREAK", handleShutdown);
+} else {
+  Deno.addSignalListener("SIGTERM", handleShutdown);
+}

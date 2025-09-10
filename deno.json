@@ -1,0 +1,9 @@
+{
+  "workspace": [
+    "./consul",
+    "./customer"
+  ],
+  "imports": {
+    "@zod/zod": "jsr:@zod/zod@^4.1.5"
+  }
+}

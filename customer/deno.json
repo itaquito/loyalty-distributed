@@ -1,8 +1,10 @@
 {
+  "name": "@service/customer",
+  "version": "1.0.0",
   "tasks": {
     "dev": "deno run --watch --allow-net ./cmd/main/main.ts"
   },
-  "imports": {
-    "@zod/zod": "jsr:@zod/zod@^4.1.5"
+  "exports": {
+    "./model": "./pkg/model/customer.ts"
   }
 }
