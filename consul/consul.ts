@@ -1,4 +1,5 @@
-import {ServiceAddressResponseSchema} from "./model.ts";
+import { ConsulAPIError } from "./error.ts";
+import { ServiceAddressResponseSchema } from "./model.ts";
 
 export class ConsulRegistry {
   private readonly consulBaseURL: string;
@@ -32,7 +33,7 @@ export class ConsulRegistry {
       })
     });
 
-    if (!res.ok) throw new Error(`Something went wrong while trying to register a service: ${res.status} ${res.statusText}`);
+    if (!res.ok) throw new ConsulAPIError();
 
     return this.instanceID;
   }
@@ -42,7 +43,7 @@ export class ConsulRegistry {
       method: "PUT",
     });
 
-    if (!res.ok) throw new Error(`Something went wrong while trying to deregister aThank service: ${res.status} ${res.statusText}`);
+    if (!res.ok) throw new ConsulAPIError();
   }
 
   async reportHealthyState() {
@@ -53,7 +54,7 @@ export class ConsulRegistry {
       method: "PUT",
     });
 
-    if (!res.ok) throw new Error(`Something went wrong while trying to report healthy state of service: ${res.status} ${res.statusText}`);
+    if (!res.ok) throw new ConsulAPIError();
   }
 
   async serviceAddress(serviceName: string) {
@@ -64,6 +65,8 @@ export class ConsulRegistry {
       method: "GET",
     });
 
+    if (!res.ok) throw new ConsulAPIError();
+
     const parsedResponse = ServiceAddressResponseSchema.parse(await res.json());
 
     return parsedResponse.map((serviceAddress) => (
@@ -73,6 +76,5 @@ export class ConsulRegistry {
         port: serviceAddress.Service.Port,
       }
     ));
-
   }
 }
