@@ -1,9 +1,9 @@
-import type { Controller } from "../../controller/customer/controller.ts";
+import type { Controller } from "../../controller/transaction/controller.ts";
 
 import { ZodError } from "@zod/zod";
 
 import { NotFoundError } from "../../controller/error.ts";
-import { CustomerIDSchema, CustomerSchema } from "../../../pkg/model/customer.ts";
+import { TransactionIDSchema, TransactionSchema } from "../../../pkg/model/transaction.ts";
 
 export class Handler {
   private controller: Controller;
@@ -12,16 +12,16 @@ export class Handler {
     this.controller = controller;
   }
 
-  getCustomer(req: Request): Response {
+  getTransaction(req: Request): Response {
     try {
       const url = new URL(req.url);
       const rawID = url.searchParams.get("id");
 
-      // Get all customers
+      // Get all transactions
       if (!rawID) {
-        const customers = this.controller.getMany();
+        const transactions = this.controller.getMany();
 
-        return new Response(JSON.stringify(Object.fromEntries(customers)), {
+        return new Response(JSON.stringify(Object.fromEntries(transactions)), {
           status: 200,
           headers: {
             "Content-Type": "application/json"
@@ -29,11 +29,11 @@ export class Handler {
         });
       }
 
-      // Get specific customer
-      const customerID = CustomerIDSchema.parse(parseInt(rawID));
-      const customer = this.controller.get(customerID);
+      // Get specific transaction
+      const transactionID = TransactionIDSchema.parse(parseInt(rawID));
+      const transaction = this.controller.get(transactionID);
 
-      return new Response(JSON.stringify(customer), {
+      return new Response(JSON.stringify(transaction), {
         status: 200,
         headers: {
           "Content-Type": "application/json"
@@ -44,7 +44,7 @@ export class Handler {
         status: 400
       });
 
-      if (error instanceof NotFoundError) return new Response("Customer Not Found", {
+      if (error instanceof NotFoundError) return new Response("Transaction Not Found", {
         status: 404
       });
 
@@ -55,16 +55,16 @@ export class Handler {
     }
   }
 
-  async postCustomer(req: Request): Response {
+  async postTransaction(req: Request): Response {
     try {
       const url = new URL(req.url);
-      const customerID = CustomerIDSchema.parse(parseInt(url.searchParams.get("id")));
-      const customer = CustomerSchema.parse(await req.json());
+      const transactionID = TransactionIDSchema.parse(parseInt(url.searchParams.get("id")));
+      const transaction = TransactionSchema.parse(await req.json());
 
-      this.controller.put(customerID, customer);
+      this.controller.put(transactionID, transaction);
 
       return new Response("Success!", {
-        status: 200
+        status: 200,
       });
     } catch (error) {
       if (error instanceof SyntaxError) return new Response("Bad Request", {
@@ -82,22 +82,22 @@ export class Handler {
     }
   }
 
-  deleteCustomer(req: Request): Response {
+  deleteTransaction(req: Request): Response {
     try {
       const url = new URL(req.url);
-      const customerID = CustomerIDSchema.parse(parseInt(url.searchParams.get("id")));
+      const transactionID = TransactionIDSchema.parse(parseInt(url.searchParams.get("id")));
 
-      this.controller.delete(customerID);
+      this.controller.delete(transactionID);
 
       return new Response("Success!", {
-        status: 200
+        status: 200,
       });
     } catch (error) {
       if (error instanceof ZodError) return new Response("Bad Request", {
         status: 400
       });
 
-      if (error instanceof NotFoundError) return new Response("Customer Not Found", {
+      if (error instanceof NotFoundError) return new Response("Transaction Not Found", {
         status: 404
       });
 

@@ -1,7 +1,7 @@
 import { ConsulRegistry } from "@pkg/consul";
 
 import { Repository } from "../../internal/repository/memory/memory.ts";
-import { Controller } from "../../internal/controller/customer/controller.ts";
+import { Controller } from "../../internal/controller/transaction/controller.ts";
 import { Handler } from "../../internal/handler/http/handler.ts";
 
 const repository = new Repository();
@@ -11,19 +11,19 @@ const handler = new Handler(controller);
 function main(req: Request): Response {
   const url = new URL(req.url);
 
-  if (url.pathname === "/customer") {
+  if (url.pathname === "/transaction") {
     switch (req.method) {
       case "GET":
-        return handler.getCustomer(req);
+        return handler.getTransaction(req);
 
       case "POST":
-        return handler.postCustomer(req);
+        return handler.postTransaction(req);
 
       case "PUT":
-        return handler.postCustomer(req);
+        return handler.postTransaction(req);
 
       case "DELETE":
-        return handler.deleteCustomer(req);
+        return handler.deleteTransaction(req);
 
       default:
         return new Response("Method Not Allowed", {
@@ -37,10 +37,10 @@ function main(req: Request): Response {
   });
 }
 
-Deno.serve({ port: 8000 }, main);
+Deno.serve({ port: 8001 }, main);
 
 const consulRegistry = new ConsulRegistry("http://192.168.56.104:8500");
-const instanceID = await consulRegistry.register("customer", "localhost", 8000);
+const instanceID = await consulRegistry.register("transaction", "localhost", 8001);
 console.log(`Instance ID: ${instanceID}`);
 
 setInterval(async () => {
