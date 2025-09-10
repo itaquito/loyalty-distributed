@@ -2,7 +2,7 @@ import type { Controller } from "../../controller/transaction/controller.ts";
 
 import { ZodError } from "@zod/zod";
 
-import { NotFoundError } from "../../controller/error.ts";
+import { NotFoundError, CustomerNotFoundError } from "../../controller/error.ts";
 import { TransactionIDSchema, TransactionSchema } from "../../../pkg/model/transaction.ts";
 
 export class Handler {
@@ -12,7 +12,7 @@ export class Handler {
     this.controller = controller;
   }
 
-  getTransaction(req: Request): Response {
+  async getTransaction(req: Request): Response {
     try {
       const url = new URL(req.url);
       const rawID = url.searchParams.get("id");
@@ -31,7 +31,7 @@ export class Handler {
 
       // Get specific transaction
       const transactionID = TransactionIDSchema.parse(parseInt(rawID));
-      const transaction = this.controller.get(transactionID);
+      const transaction = await this.controller.get(transactionID);
 
       return new Response(JSON.stringify(transaction), {
         status: 200,
@@ -61,7 +61,7 @@ export class Handler {
       const transactionID = TransactionIDSchema.parse(parseInt(url.searchParams.get("id")));
       const transaction = TransactionSchema.parse(await req.json());
 
-      this.controller.put(transactionID, transaction);
+      await this.controller.put(transactionID, transaction);
 
       return new Response("Success!", {
         status: 200,
@@ -73,6 +73,10 @@ export class Handler {
 
       if (error instanceof ZodError) return new Response("Bad Request", {
         status: 400
+      });
+
+      if (error instanceof CustomerNotFoundError) return new Response("Customer Not Found", {
+        status: 404
       });
 
       console.error(error)

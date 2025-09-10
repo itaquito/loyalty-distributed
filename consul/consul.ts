@@ -1,4 +1,4 @@
-import { ConsulAPIError } from "./error.ts";
+import { ConsulAPIError, ConsulServiceNotAvailable } from "./error.ts";
 import { ServiceAddressResponseSchema } from "./model.ts";
 
 export class ConsulRegistry {
@@ -69,12 +69,16 @@ export class ConsulRegistry {
 
     const parsedResponse = ServiceAddressResponseSchema.parse(await res.json());
 
-    return parsedResponse.map((serviceAddress) => (
+    const servicesAddresses = parsedResponse.map((serviceAddress) => (
       {
         id: serviceAddress.Service.ID,
         address: serviceAddress.Service.Address,
         port: serviceAddress.Service.Port,
       }
     ));
+
+    if (servicesAddresses.length === 0) throw new ConsulServiceNotAvailable();
+
+    return servicesAddresses;
   }
 }

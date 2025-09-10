@@ -2,10 +2,16 @@ import { ConsulRegistry } from "@pkg/consul";
 
 import { Repository } from "../../internal/repository/memory/memory.ts";
 import { Controller } from "../../internal/controller/transaction/controller.ts";
+import { CustomerGateway } from "../../internal/gateway/customer/http/customer.ts";
 import { Handler } from "../../internal/handler/http/handler.ts";
 
+const consulRegistry = new ConsulRegistry("http://192.168.56.104:8500");
+const instanceID = await consulRegistry.register("transaction", "localhost", 8001);
+console.log(`Instance ID: ${instanceID}`);
+
 const repository = new Repository();
-const controller = new Controller(repository);
+const customerGateway = new CustomerGateway(consulRegistry)
+const controller = new Controller(repository, customerGateway);
 const handler = new Handler(controller);
 
 function main(req: Request): Response {
@@ -38,10 +44,6 @@ function main(req: Request): Response {
 }
 
 Deno.serve({ port: 8001 }, main);
-
-const consulRegistry = new ConsulRegistry("http://192.168.56.104:8500");
-const instanceID = await consulRegistry.register("transaction", "localhost", 8001);
-console.log(`Instance ID: ${instanceID}`);
 
 setInterval(async () => {
   await consulRegistry.reportHealthyState();
