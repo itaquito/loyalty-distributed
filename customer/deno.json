@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "dev": "deno run --watch ./cmd/main/main.ts"
+    "dev": "deno run --watch --allow-net ./cmd/main/main.ts"
   },
   "imports": {
     "@zod/zod": "jsr:@zod/zod@^4.1.5"
