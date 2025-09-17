@@ -37,10 +37,13 @@ function main(req: Request): Response {
   });
 }
 
-Deno.serve({ port: 8000 }, main);
+const port = parseInt(Deno.env.get("PORT") || "8000");
+const consulURL = Deno.env.get("CONSUL_URL") || "http://192.168.56.104:8500";
 
-const consulRegistry = new ConsulRegistry("http://192.168.56.104:8500");
-const instanceID = await consulRegistry.register("customer", "localhost", 8000);
+Deno.serve({ port }, main);
+
+const consulRegistry = new ConsulRegistry(consulURL);
+const instanceID = await consulRegistry.register("customer", "localhost", port);
 console.log(`Instance ID: ${instanceID}`);
 
 setInterval(async () => {

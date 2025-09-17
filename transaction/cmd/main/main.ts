@@ -5,8 +5,11 @@ import { Controller } from "../../internal/controller/transaction/controller.ts"
 import { CustomerGateway } from "../../internal/gateway/customer/http/customer.ts";
 import { Handler } from "../../internal/handler/http/handler.ts";
 
-const consulRegistry = new ConsulRegistry("http://192.168.56.104:8500");
-const instanceID = await consulRegistry.register("transaction", "localhost", 8001);
+const port = parseInt(Deno.env.get("PORT") || "8001");
+const consulURL = Deno.env.get("CONSUL_URL") || "http://192.168.56.104:8500";
+
+const consulRegistry = new ConsulRegistry(consulURL);
+const instanceID = await consulRegistry.register("transaction", "localhost", port);
 console.log(`Instance ID: ${instanceID}`);
 
 const repository = new Repository();
@@ -43,7 +46,7 @@ function main(req: Request): Response {
   });
 }
 
-Deno.serve({ port: 8001 }, main);
+Deno.serve({ port }, main);
 
 setInterval(async () => {
   await consulRegistry.reportHealthyState();
