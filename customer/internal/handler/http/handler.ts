@@ -12,7 +12,7 @@ export class Handler {
     this.controller = controller;
   }
 
-  getCustomer(req: Request): Response {
+  getCustomer(req: Request) {
     try {
       const url = new URL(req.url);
       const rawID = url.searchParams.get("id");
@@ -55,10 +55,11 @@ export class Handler {
     }
   }
 
-  async postCustomer(req: Request): Response {
+  async postCustomer(req: Request) {
     try {
       const url = new URL(req.url);
-      const customerID = CustomerIDSchema.parse(parseInt(url.searchParams.get("id")));
+      const rawID = url.searchParams.get("id");
+      const customerID = CustomerIDSchema.parse(rawID ? parseInt(rawID) : null);
       const customer = CustomerSchema.parse(await req.json());
 
       this.controller.put(customerID, customer);
@@ -82,10 +83,11 @@ export class Handler {
     }
   }
 
-  deleteCustomer(req: Request): Response {
+  deleteCustomer(req: Request) {
     try {
       const url = new URL(req.url);
-      const customerID = CustomerIDSchema.parse(parseInt(url.searchParams.get("id")));
+      const rawID = url.searchParams.get("id");
+      const customerID = CustomerIDSchema.parse(rawID ? parseInt(rawID) : null);
 
       this.controller.delete(customerID);
 

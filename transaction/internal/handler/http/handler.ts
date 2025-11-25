@@ -12,7 +12,7 @@ export class Handler {
     this.controller = controller;
   }
 
-  async getTransaction(req: Request): Response {
+  async getTransaction(req: Request) {
     try {
       const url = new URL(req.url);
       const rawID = url.searchParams.get("id");
@@ -55,10 +55,11 @@ export class Handler {
     }
   }
 
-  async postTransaction(req: Request): Response {
+  async postTransaction(req: Request) {
     try {
       const url = new URL(req.url);
-      const transactionID = TransactionIDSchema.parse(parseInt(url.searchParams.get("id")));
+      const rawID = url.searchParams.get("id");
+      const transactionID = TransactionIDSchema.parse(rawID ? parseInt(rawID) : null);
       const transaction = TransactionSchema.parse(await req.json());
 
       await this.controller.put(transactionID, transaction);
@@ -86,10 +87,11 @@ export class Handler {
     }
   }
 
-  deleteTransaction(req: Request): Response {
+  deleteTransaction(req: Request) {
     try {
       const url = new URL(req.url);
-      const transactionID = TransactionIDSchema.parse(parseInt(url.searchParams.get("id")));
+      const rawID = url.searchParams.get("id");
+      const transactionID = TransactionIDSchema.parse(rawID ? parseInt(rawID) : null);
 
       this.controller.delete(transactionID);
 
