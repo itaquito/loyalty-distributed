@@ -1,6 +1,7 @@
 {
   "workspace": [
     "./consul",
+    "./business",
     "./customer",
     "./transaction"
   ],

@@ -1,0 +1,10 @@
+{
+  "name": "@service/business",
+  "version": "1.0.0",
+  "tasks": {
+    "dev": "deno run --watch --allow-net ./cmd/main/main.ts"
+  },
+  "exports": {
+    "./model": "./pkg/model/business.ts"
+  }
+}
