@@ -1,4 +1,4 @@
-import z from "@zod/zod"
+import z from "zod";
 
 import { BusinessIDSchema } from "@service/business/model";
 

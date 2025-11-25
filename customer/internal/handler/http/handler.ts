@@ -1,6 +1,6 @@
 import type { Controller } from "../../controller/customer/controller.ts";
 
-import { ZodError } from "@zod/zod";
+import { ZodError } from "zod";
 
 import { NotFoundError } from "../../controller/error.ts";
 import { CustomerIDSchema, CustomerSchema } from "../../../pkg/model/customer.ts";

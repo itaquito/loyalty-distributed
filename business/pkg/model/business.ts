@@ -1,4 +1,4 @@
-import z from "@zod/zod"
+import z from "zod";
 
 export const BusinessIDSchema = z.number().positive();
 export type BusinessID = z.infer<typeof BusinessIDSchema>;
