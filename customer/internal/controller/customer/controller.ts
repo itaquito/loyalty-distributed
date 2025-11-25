@@ -1,20 +1,26 @@
 import type { Repository } from "../../repository/postgres/postgres.ts";
 import type { Customer, CustomerID } from "../../../pkg/schema/customer.ts";
+import type { BusinessGateway } from "../../gateway/business/http/business.ts";
 
-import { NotFoundError } from "../error.ts";
+import { NotFoundError, BusinessNotFoundError } from "../error.ts";
 
 export class Controller {
-  private repository: Repository
+  private repository: Repository;
+  private businessGateway: BusinessGateway;
 
-  constructor(repository: Repository) {
+  constructor(repository: Repository, businessGateway: BusinessGateway) {
     this.repository = repository;
+    this.businessGateway = businessGateway;
   }
 
   async get(customerID: CustomerID) {
     const customer = await this.repository.get(customerID);
-
     if (!customer) throw new NotFoundError();
-    return customer;
+
+    const business = await this.businessGateway.getBusiness(customer.businessID);
+    if (!business) throw new BusinessNotFoundError();
+
+    return { ...customer, business };
   }
 
   async getMany() {
@@ -22,6 +28,9 @@ export class Controller {
   }
 
   async put(customerID: CustomerID, customer: Customer) {
+    const business = await this.businessGateway.getBusiness(customer.businessID);
+    if (!business) throw new BusinessNotFoundError();
+
     return await this.repository.put(customerID, customer);
   }
 

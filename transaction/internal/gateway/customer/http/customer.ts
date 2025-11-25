@@ -1,6 +1,7 @@
-import { ConsulRegistry } from "@pkg/consul";
+import type { ConsulRegistry } from "@pkg/consul";
+import type { CustomerID } from "@service/customer/schema";
 
-import { CustomerID, CustomerSchema } from "@service/customer/schema";
+import {  CustomerSchema } from "@service/customer/schema";
 import { GatewayError } from "../../error.ts";
 
 export class CustomerGateway {
@@ -15,7 +16,7 @@ export class CustomerGateway {
     const randomIndex = Math.floor(Math.random() * addresses.length);
 
     const url = new URL(`http://${addresses[randomIndex].address}:${addresses[randomIndex].port}/customer`);
-    url.searchParams.set("id", customerID);
+    url.searchParams.set("id", `${customerID}`);
 
     const res = await fetch(url, {
       method: "GET",

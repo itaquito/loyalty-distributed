@@ -4,3 +4,10 @@ export class NotFoundError extends Error {
     this.name = "NotFoundError";
   }
 }
+
+export class BusinessNotFoundError extends Error {
+  constructor() {
+    super("Business Not Found");
+    this.name = "BusinessNotFoundError";
+  }
+}

@@ -1,9 +1,9 @@
-import type { Controller } from "../../controller/customer/controller.ts";
+import type { Controller } from "../../controller/business/controller.ts";
 
 import { ZodError } from "zod";
 
-import { NotFoundError, BusinessNotFoundError } from "../../controller/error.ts";
-import { CustomerIDSchema, CustomerSchema } from "../../../pkg/schema/customer.ts";
+import { NotFoundError } from "../../controller/error.ts";
+import { BusinessIDSchema, BusinessSchema } from "../../../pkg/schema/business.ts";
 
 export class Handler {
   private controller: Controller;
@@ -12,16 +12,16 @@ export class Handler {
     this.controller = controller;
   }
 
-  async getCustomer(req: Request) {
+  async getBusiness(req: Request) {
     try {
       const url = new URL(req.url);
       const rawID = url.searchParams.get("id");
 
-      // Get all customers
+      // Get all businesses
       if (!rawID) {
-        const customers = await this.controller.getMany();
+        const businesses = await this.controller.getMany();
 
-        return new Response(JSON.stringify(customers), {
+        return new Response(JSON.stringify(businesses), {
           status: 200,
           headers: {
             "Content-Type": "application/json"
@@ -29,11 +29,11 @@ export class Handler {
         });
       }
 
-      // Get specific customer
-      const customerID = CustomerIDSchema.parse(parseInt(rawID));
-      const customer = await this.controller.get(customerID);
+      // Get specific business
+      const businessID = BusinessIDSchema.parse(parseInt(rawID));
+      const business = await this.controller.get(businessID);
 
-      return new Response(JSON.stringify(customer), {
+      return new Response(JSON.stringify(business), {
         status: 200,
         headers: {
           "Content-Type": "application/json"
@@ -44,11 +44,7 @@ export class Handler {
         status: 400
       });
 
-      if (error instanceof NotFoundError) return new Response("Customer Not Found", {
-        status: 404
-      });
-
-      if (error instanceof BusinessNotFoundError) return new Response("Business Not Found", {
+      if (error instanceof NotFoundError) return new Response("Business Not Found", {
         status: 404
       });
 
@@ -59,14 +55,14 @@ export class Handler {
     }
   }
 
-  async postCustomer(req: Request) {
+  async postBusiness(req: Request) {
     try {
       const url = new URL(req.url);
       const rawID = url.searchParams.get("id");
-      const customerID = CustomerIDSchema.parse(rawID ? parseInt(rawID) : null);
-      const customer = CustomerSchema.parse(await req.json());
+      const businessID = BusinessIDSchema.parse(rawID ? parseInt(rawID) : null);
+      const business = BusinessSchema.parse(await req.json());
 
-      await this.controller.put(customerID, customer);
+      await this.controller.put(businessID, business);
 
       return new Response("Success!", {
         status: 200
@@ -80,10 +76,6 @@ export class Handler {
         status: 400
       });
 
-      if (error instanceof BusinessNotFoundError) return new Response("Business Not Found", {
-        status: 404
-      });
-
       console.error(error)
       return new Response("Internal Server Error", {
         status: 500
@@ -91,13 +83,13 @@ export class Handler {
     }
   }
 
-  async deleteCustomer(req: Request) {
+  async deleteBusiness(req: Request) {
     try {
       const url = new URL(req.url);
       const rawID = url.searchParams.get("id");
-      const customerID = CustomerIDSchema.parse(rawID ? parseInt(rawID) : null);
+      const businessID = BusinessIDSchema.parse(rawID ? parseInt(rawID) : null);
 
-      await this.controller.delete(customerID);
+      await this.controller.delete(businessID);
 
       return new Response("Success!", {
         status: 200
@@ -107,7 +99,7 @@ export class Handler {
         status: 400
       });
 
-      if (error instanceof NotFoundError) return new Response("Customer Not Found", {
+      if (error instanceof NotFoundError) return new Response("Business Not Found", {
         status: 404
       });
 
