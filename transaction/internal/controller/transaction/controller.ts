@@ -1,6 +1,7 @@
 import type { Repository } from "../../repository/postgres/postgres.ts";
 import type { Transaction, TransactionID } from "../../../pkg/schema/transaction.ts";
 import type { CustomerGateway } from "../../gateway/customer/http/customer.ts";
+import type { CustomerID } from "@service/customer/schema";
 
 import { NotFoundError, CustomerNotFoundError } from "../error.ts";
 
@@ -17,15 +18,15 @@ export class Controller {
     const transaction = await this.repository.get(transactionID);
     if (!transaction) throw new NotFoundError();
 
-    const customer = await this.customerGateway.getCustomer(transaction.customerID);
-    if (!customer) throw new CustomerNotFoundError();
-
-
-    return { ...transaction, customer };
+    return transaction;
   }
 
   async getMany() {
     return await this.repository.getMany();
+  }
+
+  async getByCustomerID(customerID: CustomerID) {
+    return await this.repository.getByCustomerID(customerID);
   }
 
   async put(transactionID: TransactionID, transaction: Transaction) {

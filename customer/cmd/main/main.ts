@@ -4,6 +4,7 @@ import { closeDatabase } from "@pkg/db";
 import { Repository } from "../../internal/repository/postgres/postgres.ts";
 import { Controller } from "../../internal/controller/customer/controller.ts";
 import { BusinessGateway } from "../../internal/gateway/business/http/business.ts";
+import { TransactionGateway } from "../../internal/gateway/transaction/http/transaction.ts";
 import { Handler } from "../../internal/handler/http/handler.ts";
 
 const port = parseInt(Deno.env.get("PORT") || "8000");
@@ -15,7 +16,8 @@ console.log(`Instance ID: ${instanceID}`);
 
 const repository = new Repository();
 const businessGateway = new BusinessGateway(consulRegistry);
-const controller = new Controller(repository, businessGateway);
+const transactionGateway = new TransactionGateway(consulRegistry);
+const controller = new Controller(repository, businessGateway, transactionGateway);
 const handler = new Handler(controller);
 
 async function main(req: Request): Promise<Response> {

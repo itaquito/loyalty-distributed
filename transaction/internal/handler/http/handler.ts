@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 
 import { NotFoundError, CustomerNotFoundError } from "../../controller/error.ts";
 import { TransactionIDSchema, TransactionSchema } from "../../../pkg/schema/transaction.ts";
+import { CustomerIDSchema } from "@service/customer/schema";
 
 export class Handler {
   private controller: Controller;
@@ -16,6 +17,20 @@ export class Handler {
     try {
       const url = new URL(req.url);
       const rawID = url.searchParams.get("id");
+      const rawCustomerID = url.searchParams.get("customerID");
+
+      // Get transactions by customerID
+      if (rawCustomerID) {
+        const customerID = CustomerIDSchema.parse(parseInt(rawCustomerID));
+        const transactions = await this.controller.getByCustomerID(customerID);
+
+        return new Response(JSON.stringify(transactions), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json"
+          },
+        });
+      }
 
       // Get all transactions
       if (!rawID) {
