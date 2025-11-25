@@ -1,21 +1,17 @@
-import type { ConsulRegistry } from "@pkg/consul";
 import type { CustomerID } from "@service/customer/schema";
 
 import {  CustomerSchema } from "@service/customer/schema";
 import { GatewayError } from "../../error.ts";
 
 export class CustomerGateway {
-  private registry: ConsulRegistry;
+  private serviceUrl: string;
 
-  constructor(registry: ConsulRegistry) {
-    this.registry = registry;
+  constructor(serviceUrl = "http://customer-service:8080") {
+    this.serviceUrl = serviceUrl;
   }
 
   async getCustomer(customerID: CustomerID) {
-    const addresses = await this.registry.serviceAddress("customer");
-    const randomIndex = Math.floor(Math.random() * addresses.length);
-
-    const url = new URL(`http://${addresses[randomIndex].address}:${addresses[randomIndex].port}/customer`);
+    const url = new URL(`${this.serviceUrl}/customer`);
     url.searchParams.set("id", `${customerID}`);
 
     const res = await fetch(url, {

@@ -1,4 +1,3 @@
-import { ConsulRegistry } from "@pkg/consul";
 import { closeDatabase } from "@pkg/db";
 
 import { Repository } from "../../internal/repository/postgres/postgres.ts";
@@ -7,16 +6,11 @@ import { BusinessGateway } from "../../internal/gateway/business/http/business.t
 import { TransactionGateway } from "../../internal/gateway/transaction/http/transaction.ts";
 import { Handler } from "../../internal/handler/http/handler.ts";
 
-const port = parseInt(Deno.env.get("PORT") || "8000");
-const consulURL = Deno.env.get("CONSUL_URL") || "http://192.168.56.104:8500";
-
-const consulRegistry = new ConsulRegistry(consulURL);
-const instanceID = await consulRegistry.register("customer", "localhost", port);
-console.log(`Instance ID: ${instanceID}`);
+const port = parseInt(Deno.env.get("PORT") || "8080");
 
 const repository = new Repository();
-const businessGateway = new BusinessGateway(consulRegistry);
-const transactionGateway = new TransactionGateway(consulRegistry);
+const businessGateway = new BusinessGateway();
+const transactionGateway = new TransactionGateway();
 const controller = new Controller(repository, businessGateway, transactionGateway);
 const handler = new Handler(controller);
 
@@ -51,14 +45,8 @@ async function main(req: Request): Promise<Response> {
 
 Deno.serve({ port }, main);
 
-setInterval(async () => {
-  await consulRegistry.reportHealthyState();
-}, 1000)
-
 async function handleShutdown() {
-  await consulRegistry.deregister();
   await closeDatabase();
-
   Deno.exit();
 }
 

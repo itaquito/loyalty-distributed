@@ -1,5 +1,0 @@
-{
-  "name": "@pkg/consul",
-  "version": "1.0.0",
-  "exports": "./consul.ts"
-}

@@ -1,9 +1,10 @@
-import { ConsulRegistry } from "@pkg/consul";
 import { closeDatabase } from "@pkg/db";
 
 import { Repository } from "../../internal/repository/postgres/postgres.ts";
 import { Controller } from "../../internal/controller/business/controller.ts";
 import { Handler } from "../../internal/handler/http/handler.ts";
+
+const port = parseInt(Deno.env.get("PORT") || "8080");
 
 const repository = new Repository();
 const controller = new Controller(repository);
@@ -38,23 +39,10 @@ async function main(req: Request): Promise<Response> {
   });
 }
 
-const port = parseInt(Deno.env.get("PORT") || "8002");
-const consulURL = Deno.env.get("CONSUL_URL") || "http://192.168.56.104:8500";
-
 Deno.serve({ port }, main);
 
-const consulRegistry = new ConsulRegistry(consulURL);
-const instanceID = await consulRegistry.register("business", "localhost", port);
-console.log(`Instance ID: ${instanceID}`);
-
-setInterval(async () => {
-  await consulRegistry.reportHealthyState();
-}, 1000)
-
 async function handleShutdown() {
-  await consulRegistry.deregister();
   await closeDatabase();
-
   Deno.exit();
 }
 

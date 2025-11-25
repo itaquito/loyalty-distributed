@@ -1,4 +1,3 @@
-import type { ConsulRegistry } from "@pkg/consul";
 import type { CustomerID } from "@service/customer/schema";
 import type { Transaction } from "@service/transaction/schema";
 
@@ -7,17 +6,14 @@ import { GatewayError } from "../../error.ts";
 import { z } from "zod";
 
 export class TransactionGateway {
-  private registry: ConsulRegistry;
+  private serviceUrl: string;
 
-  constructor(registry: ConsulRegistry) {
-    this.registry = registry;
+  constructor(serviceUrl = "http://transaction-service:8080") {
+    this.serviceUrl = serviceUrl;
   }
 
   async getTransactionsByCustomer(customerID: CustomerID): Promise<Transaction[]> {
-    const addresses = await this.registry.serviceAddress("transaction");
-    const randomIndex = Math.floor(Math.random() * addresses.length);
-
-    const url = new URL(`http://${addresses[randomIndex].address}:${addresses[randomIndex].port}/transaction`);
+    const url = new URL(`${this.serviceUrl}/transaction`);
     url.searchParams.set("customerID", `${customerID}`);
 
     const res = await fetch(url, {

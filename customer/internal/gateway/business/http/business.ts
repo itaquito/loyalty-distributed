@@ -1,21 +1,17 @@
-import type { ConsulRegistry } from "@pkg/consul";
 import type { BusinessID } from "@service/business/schema";
 
 import { BusinessSchema } from "@service/business/schema";
 import { GatewayError } from "../../error.ts";
 
 export class BusinessGateway {
-  private registry: ConsulRegistry;
+  private serviceUrl: string;
 
-  constructor(registry: ConsulRegistry) {
-    this.registry = registry;
+  constructor(serviceUrl = "http://business-service:8080") {
+    this.serviceUrl = serviceUrl;
   }
 
   async getBusiness(businessID: BusinessID) {
-    const addresses = await this.registry.serviceAddress("business");
-    const randomIndex = Math.floor(Math.random() * addresses.length);
-
-    const url = new URL(`http://${addresses[randomIndex].address}:${addresses[randomIndex].port}/business`);
+    const url = new URL(`${this.serviceUrl}/business`);
     url.searchParams.set("id", `${businessID}`);
 
     const res = await fetch(url, {
