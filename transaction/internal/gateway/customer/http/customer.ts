@@ -1,6 +1,6 @@
 import { ConsulRegistry } from "@pkg/consul";
 
-import { CustomerID, CustomerSchema } from "@service/customer/model";
+import { CustomerID, CustomerSchema } from "@service/customer/schema";
 import { GatewayError } from "../../error.ts";
 
 export class CustomerGateway {

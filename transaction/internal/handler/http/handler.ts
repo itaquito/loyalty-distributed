@@ -3,7 +3,7 @@ import type { Controller } from "../../controller/transaction/controller.ts";
 import { ZodError } from "zod";
 
 import { NotFoundError, CustomerNotFoundError } from "../../controller/error.ts";
-import { TransactionIDSchema, TransactionSchema } from "../../../pkg/model/transaction.ts";
+import { TransactionIDSchema, TransactionSchema } from "../../../pkg/schema/transaction.ts";
 
 export class Handler {
   private controller: Controller;
@@ -19,9 +19,9 @@ export class Handler {
 
       // Get all transactions
       if (!rawID) {
-        const transactions = this.controller.getMany();
+        const transactions = await this.controller.getMany();
 
-        return new Response(JSON.stringify(Object.fromEntries(transactions)), {
+        return new Response(JSON.stringify(transactions), {
           status: 200,
           headers: {
             "Content-Type": "application/json"
@@ -87,13 +87,13 @@ export class Handler {
     }
   }
 
-  deleteTransaction(req: Request) {
+  async deleteTransaction(req: Request) {
     try {
       const url = new URL(req.url);
       const rawID = url.searchParams.get("id");
       const transactionID = TransactionIDSchema.parse(rawID ? parseInt(rawID) : null);
 
-      this.controller.delete(transactionID);
+      await this.controller.delete(transactionID);
 
       return new Response("Success!", {
         status: 200,

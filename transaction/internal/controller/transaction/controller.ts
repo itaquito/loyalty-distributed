@@ -1,5 +1,5 @@
-import type { Repository } from "../../repository/memory/memory.ts";
-import type { Transaction, TransactionID } from "../../../pkg/model/transaction.ts";
+import type { Repository } from "../../repository/postgres/postgres.ts";
+import type { Transaction, TransactionID } from "../../../pkg/schema/transaction.ts";
 import type { CustomerGateway } from "../../gateway/customer/http/customer.ts";
 
 import { NotFoundError, CustomerNotFoundError } from "../error.ts";
@@ -14,7 +14,7 @@ export class Controller {
   }
 
   async get(transactionID: TransactionID) {
-    const transaction = this.repository.get(transactionID);
+    const transaction = await this.repository.get(transactionID);
     if (!transaction) throw new NotFoundError();
 
     const customer = await this.customerGateway.getCustomer(transaction.customerID);
@@ -24,19 +24,19 @@ export class Controller {
     return { ...transaction, customer };
   }
 
-  getMany() {
-    return this.repository.getMany();
+  async getMany() {
+    return await this.repository.getMany();
   }
 
   async put(transactionID: TransactionID, transaction: Transaction) {
     const customer = await this.customerGateway.getCustomer(transaction.customerID);
     if (!customer) throw new CustomerNotFoundError();
 
-    return this.repository.put(transactionID, transaction);
+    return await this.repository.put(transactionID, transaction);
   }
 
-  delete(transactionID: TransactionID) {
-    const wasDeleted = this.repository.delete(transactionID);
+  async delete(transactionID: TransactionID) {
+    const wasDeleted = await this.repository.delete(transactionID);
 
     if (!wasDeleted) throw new NotFoundError()
   }

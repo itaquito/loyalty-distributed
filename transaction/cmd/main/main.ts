@@ -1,6 +1,7 @@
 import { ConsulRegistry } from "@pkg/consul";
+import { closeDatabase } from "@pkg/db";
 
-import { Repository } from "../../internal/repository/memory/memory.ts";
+import { Repository } from "../../internal/repository/postgres/postgres.ts";
 import { Controller } from "../../internal/controller/transaction/controller.ts";
 import { CustomerGateway } from "../../internal/gateway/customer/http/customer.ts";
 import { Handler } from "../../internal/handler/http/handler.ts";
@@ -17,22 +18,22 @@ const customerGateway = new CustomerGateway(consulRegistry)
 const controller = new Controller(repository, customerGateway);
 const handler = new Handler(controller);
 
-function main(req: Request): Response {
+async function main(req: Request): Promise<Response> {
   const url = new URL(req.url);
 
   if (url.pathname === "/transaction") {
     switch (req.method) {
       case "GET":
-        return handler.getTransaction(req);
+        return await handler.getTransaction(req);
 
       case "POST":
-        return handler.postTransaction(req);
+        return await handler.postTransaction(req);
 
       case "PUT":
-        return handler.postTransaction(req);
+        return await handler.postTransaction(req);
 
       case "DELETE":
-        return handler.deleteTransaction(req);
+        return await handler.deleteTransaction(req);
 
       default:
         return new Response("Method Not Allowed", {
@@ -54,6 +55,7 @@ setInterval(async () => {
 
 async function handleShutdown() {
   await consulRegistry.deregister();
+  await closeDatabase();
 
   Deno.exit();
 }

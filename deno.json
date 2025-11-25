@@ -1,11 +1,23 @@
 {
   "workspace": [
     "./consul",
+    "./db",
     "./business",
     "./customer",
     "./transaction"
   ],
   "imports": {
+    "@types/pg": "npm:@types/pg@^8.15.6",
+    "drizzle-kit": "npm:drizzle-kit@^0.31.7",
+    "drizzle-orm": "npm:drizzle-orm@^0.44.7",
+    "drizzle-zod": "npm:drizzle-zod@^0.8.3",
+    "pg": "npm:pg@^8.16.3",
     "zod": "npm:zod@^4.1.13"
+  },
+  "tasks": {
+    "db:generate": "deno run -A npm:drizzle-kit generate",
+    "db:migrate": "deno run -A npm:drizzle-kit migrate",
+    "db:push": "deno run -A npm:drizzle-kit push",
+    "db:studio": "deno run -A npm:drizzle-kit studio"
   }
 }

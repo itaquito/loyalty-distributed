@@ -1,6 +1,7 @@
 import { ConsulRegistry } from "@pkg/consul";
+import { closeDatabase } from "@pkg/db";
 
-import { Repository } from "../../internal/repository/memory/memory.ts";
+import { Repository } from "../../internal/repository/postgres/postgres.ts";
 import { Controller } from "../../internal/controller/customer/controller.ts";
 import { Handler } from "../../internal/handler/http/handler.ts";
 
@@ -8,22 +9,22 @@ const repository = new Repository();
 const controller = new Controller(repository);
 const handler = new Handler(controller);
 
-function main(req: Request): Response {
+async function main(req: Request): Promise<Response> {
   const url = new URL(req.url);
 
   if (url.pathname === "/customer") {
     switch (req.method) {
       case "GET":
-        return handler.getCustomer(req);
+        return await handler.getCustomer(req);
 
       case "POST":
-        return handler.postCustomer(req);
+        return await handler.postCustomer(req);
 
       case "PUT":
-        return handler.postCustomer(req);
+        return await handler.postCustomer(req);
 
       case "DELETE":
-        return handler.deleteCustomer(req);
+        return await handler.deleteCustomer(req);
 
       default:
         return new Response("Method Not Allowed", {
@@ -52,6 +53,7 @@ setInterval(async () => {
 
 async function handleShutdown() {
   await consulRegistry.deregister();
+  await closeDatabase();
 
   Deno.exit();
 }

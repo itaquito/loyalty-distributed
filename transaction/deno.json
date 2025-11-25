@@ -5,6 +5,6 @@
     "dev": "deno run --watch --allow-net ./cmd/main/main.ts"
   },
   "exports": {
-    "./model": "./pkg/model/transaction.ts"
+    "./schema": "./pkg/schema/transaction.ts"
   }
 }

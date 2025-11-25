@@ -1,5 +1,5 @@
-import type { Repository } from "../../repository/memory/memory.ts";
-import type { Customer, CustomerID } from "../../../pkg/model/customer.ts";
+import type { Repository } from "../../repository/postgres/postgres.ts";
+import type { Customer, CustomerID } from "../../../pkg/schema/customer.ts";
 
 import { NotFoundError } from "../error.ts";
 
@@ -10,23 +10,23 @@ export class Controller {
     this.repository = repository;
   }
 
-  get(customerID: CustomerID) {
-    const customer = this.repository.get(customerID);
+  async get(customerID: CustomerID) {
+    const customer = await this.repository.get(customerID);
 
     if (!customer) throw new NotFoundError();
     return customer;
   }
 
-  getMany() {
-    return this.repository.getMany();
+  async getMany() {
+    return await this.repository.getMany();
   }
 
-  put(customerID: CustomerID, customer: Customer) {
-    return this.repository.put(customerID, customer);
+  async put(customerID: CustomerID, customer: Customer) {
+    return await this.repository.put(customerID, customer);
   }
 
-  delete(customerID: CustomerID) {
-    const wasDeleted = this.repository.delete(customerID);
+  async delete(customerID: CustomerID) {
+    const wasDeleted = await this.repository.delete(customerID);
 
     if (!wasDeleted) throw new NotFoundError()
   }

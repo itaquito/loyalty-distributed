@@ -3,7 +3,7 @@ import type { Controller } from "../../controller/customer/controller.ts";
 import { ZodError } from "zod";
 
 import { NotFoundError } from "../../controller/error.ts";
-import { CustomerIDSchema, CustomerSchema } from "../../../pkg/model/customer.ts";
+import { CustomerIDSchema, CustomerSchema } from "../../../pkg/schema/customer.ts";
 
 export class Handler {
   private controller: Controller;
@@ -12,16 +12,16 @@ export class Handler {
     this.controller = controller;
   }
 
-  getCustomer(req: Request) {
+  async getCustomer(req: Request) {
     try {
       const url = new URL(req.url);
       const rawID = url.searchParams.get("id");
 
       // Get all customers
       if (!rawID) {
-        const customers = this.controller.getMany();
+        const customers = await this.controller.getMany();
 
-        return new Response(JSON.stringify(Object.fromEntries(customers)), {
+        return new Response(JSON.stringify(customers), {
           status: 200,
           headers: {
             "Content-Type": "application/json"
@@ -31,7 +31,7 @@ export class Handler {
 
       // Get specific customer
       const customerID = CustomerIDSchema.parse(parseInt(rawID));
-      const customer = this.controller.get(customerID);
+      const customer = await this.controller.get(customerID);
 
       return new Response(JSON.stringify(customer), {
         status: 200,
@@ -62,7 +62,7 @@ export class Handler {
       const customerID = CustomerIDSchema.parse(rawID ? parseInt(rawID) : null);
       const customer = CustomerSchema.parse(await req.json());
 
-      this.controller.put(customerID, customer);
+      await this.controller.put(customerID, customer);
 
       return new Response("Success!", {
         status: 200
@@ -83,13 +83,13 @@ export class Handler {
     }
   }
 
-  deleteCustomer(req: Request) {
+  async deleteCustomer(req: Request) {
     try {
       const url = new URL(req.url);
       const rawID = url.searchParams.get("id");
       const customerID = CustomerIDSchema.parse(rawID ? parseInt(rawID) : null);
 
-      this.controller.delete(customerID);
+      await this.controller.delete(customerID);
 
       return new Response("Success!", {
         status: 200
