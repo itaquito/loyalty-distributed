@@ -1,8 +1,16 @@
 <script lang="ts">
   import type { Customer } from "$lib/types";
-  import * as Table from "$lib/components/ui/table";
+
   import { config } from "$lib/config";
+
+  import { Ellipsis, Pencil, Trash2 } from '@lucide/svelte';
+
+  import * as Table from "$lib/components/ui/table";
+  import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
+  import * as Button from "$lib/components/ui/button";
+
   import CreateCustomerDialog from "./CreateCustomerDialog.svelte";
+  import EditCustomerDialog from "./EditCustomerDialog.svelte";
 
   async function fetchCustomers(): Promise<Customer[]> {
     const response = await fetch(`${config.apiBaseUrl}/customer`);
@@ -16,6 +24,8 @@
   }
 
   let customersPromise = $state(fetchCustomers());
+  let editingCustomer = $state<Customer | null>(null);
+  let isEditDialogOpen = $state(false);
 
   function refreshCustomers() {
     customersPromise = fetchCustomers();
@@ -29,6 +39,36 @@
         ? acc + transaction.quantity
         : acc - transaction.quantity;
     }, 0);
+  }
+
+  function handleEdit(customer: Customer) {
+    editingCustomer = customer;
+    isEditDialogOpen = true;
+  }
+
+  async function handleDelete(customer: Customer) {
+    if (!confirm(`Are you sure you want to delete customer "${customer.name}"?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${config.apiBaseUrl}/customer?id=${customer.id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `Failed to delete customer: ${response.statusText}`);
+      }
+
+      refreshCustomers();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete customer");
+      console.error("Error deleting customer:", err);
+    }
   }
 </script>
 
@@ -57,20 +97,50 @@
             <Table.Head>Business ID</Table.Head>
             <Table.Head class="text-right">Transactions</Table.Head>
             <Table.Head class="text-right">Balance</Table.Head>
+            <Table.Head class="w-[50px]"></Table.Head>
           </Table.Row>
         </Table.Header>
+
         <Table.Body>
           {#each customers as customer}
             <Table.Row>
               <Table.Cell class="font-medium">{customer.id}</Table.Cell>
+
               <Table.Cell>{customer.name}</Table.Cell>
+
               <Table.Cell>{customer.business?.name ?? "N/A"}</Table.Cell>
+
               <Table.Cell>{customer.businessID}</Table.Cell>
+
               <Table.Cell class="text-right">
                 {customer.transactions?.length ?? 0}
               </Table.Cell>
+
               <Table.Cell class="text-right">
                 {calculateBalance(customer.transactions)}
+              </Table.Cell>
+
+              <Table.Cell>
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger>
+                    <Button.Root variant="ghost" size="icon">
+                      <Ellipsis class="h-4 w-4" />
+                      <span class="sr-only">Open menu</span>
+                    </Button.Root>
+                  </DropdownMenu.Trigger>
+
+                  <DropdownMenu.Content align="end">
+                    <DropdownMenu.Item onclick={() => handleEdit(customer)}>
+                      <Pencil class="mr-2 h-4 w-4" />
+                      Edit
+                    </DropdownMenu.Item>
+
+                    <DropdownMenu.Item onclick={() => handleDelete(customer)} class="text-destructive">
+                      <Trash2 class="mr-2 h-4 w-4" />
+                      Delete
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Root>
               </Table.Cell>
             </Table.Row>
           {/each}
@@ -82,4 +152,12 @@
       <p class="text-destructive">Error: {error.message}</p>
     </div>
   {/await}
+
+  {#if editingCustomer}
+    <EditCustomerDialog
+      customer={editingCustomer}
+      bind:open={isEditDialogOpen}
+      onCustomerUpdated={refreshCustomers}
+    />
+  {/if}
 </div>

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Customer } from "$lib/types";
+
   import { config } from "$lib/config";
 
   import * as Dialog from "$lib/components/ui/dialog";
@@ -7,17 +9,17 @@
   import * as Input from "$lib/components/ui/input";
 
   interface Props {
+    customer: Customer;
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
-    onCustomerCreated?: () => void;
+    onCustomerUpdated?: () => void;
   }
 
-  let { open = $bindable(false), onOpenChange, onCustomerCreated }: Props = $props();
+  let { customer, open = $bindable(false), onOpenChange, onCustomerUpdated }: Props = $props();
 
   let formData = $state({
-    id: "",
-    name: "",
-    businessID: "",
+    name: customer.name,
+    businessID: customer.businessID.toString(),
   });
 
   let isSubmitting = $state(false);
@@ -26,7 +28,7 @@
   async function handleSubmit(e: Event) {
     e.preventDefault();
 
-    if (!formData.id || !formData.name || !formData.businessID) {
+    if (!formData.name || !formData.businessID) {
       error = "All fields are required";
       return;
     }
@@ -36,7 +38,7 @@
       error = null;
 
       const response = await fetch(
-        `${config.apiBaseUrl}/customer?id=${formData.id}`,
+        `${config.apiBaseUrl}/customer?id=${customer.id}`,
         {
           method: "POST",
           headers: {
@@ -51,16 +53,14 @@
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(errorText || `Failed to create customer: ${response.statusText}`);
+        throw new Error(errorText || `Failed to update customer: ${response.statusText}`);
       }
 
-      // Reset form
-      formData = { id: "", name: "", businessID: "" };
       open = false;
-      onCustomerCreated?.();
+      onCustomerUpdated?.();
     } catch (err) {
       error = err instanceof Error ? err.message : "An unknown error occurred";
-      console.error("Error creating customer:", err);
+      console.error("Error updating customer:", err);
     } finally {
       isSubmitting = false;
     }
@@ -72,40 +72,39 @@
 
     if (!newOpen) {
       // Reset form when dialog closes
-      formData = { id: "", name: "", businessID: "" };
+      formData = {
+        name: customer.name,
+        businessID: customer.businessID.toString(),
+      };
       error = null;
     }
   }
 </script>
 
 <Dialog.Root {open} onOpenChange={handleOpenChange}>
-  <Dialog.Trigger>
-    Create Customer
-  </Dialog.Trigger>
   <Dialog.Content class="sm:max-w-[425px]">
     <Dialog.Header>
-      <Dialog.Title>Create New Customer</Dialog.Title>
+      <Dialog.Title>Edit Customer</Dialog.Title>
       <Dialog.Description>
-        Add a new customer to the loyalty system. All fields are required.
+        Update customer information. Customer ID cannot be changed.
       </Dialog.Description>
     </Dialog.Header>
 
     <form onsubmit={handleSubmit} class="space-y-4">
       <div class="space-y-2">
-        <Label.Root for="id">Customer ID</Label.Root>
+        <Label.Root for="edit-id">Customer ID</Label.Root>
         <Input.Root
-          id="id"
+          id="edit-id"
           type="number"
-          bind:value={formData.id}
-          placeholder="Enter customer ID"
-          required
+          value={customer.id}
+          disabled
         />
       </div>
 
       <div class="space-y-2">
-        <Label.Root for="name">Name</Label.Root>
+        <Label.Root for="edit-name">Name</Label.Root>
         <Input.Root
-          id="name"
+          id="edit-name"
           type="text"
           bind:value={formData.name}
           placeholder="Enter customer name"
@@ -114,9 +113,9 @@
       </div>
 
       <div class="space-y-2">
-        <Label.Root for="businessID">Business ID</Label.Root>
+        <Label.Root for="edit-businessID">Business ID</Label.Root>
         <Input.Root
-          id="businessID"
+          id="edit-businessID"
           type="number"
           bind:value={formData.businessID}
           placeholder="Enter business ID"
@@ -132,7 +131,7 @@
 
       <Dialog.Footer>
         <Button.Root type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Creating..." : "Create Customer"}
+          {isSubmitting ? "Updating..." : "Update Customer"}
         </Button.Root>
       </Dialog.Footer>
     </form>
