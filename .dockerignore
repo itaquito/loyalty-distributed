@@ -1,0 +1,28 @@
+# Version control
+.git
+.gitignore
+
+# Build outputs
+drizzle/
+
+# Documentation
+README.md
+CLAUDE.md
+*.md
+
+# Docker files
+docker-compose.yml
+Makefile
+
+# Kubernetes configs
+k8s-configs/
+
+# Node modules (if any)
+node_modules/
+
+# Deno cache
+.deno/
+
+# IDE
+.vscode/
+.idea/
