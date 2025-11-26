@@ -23,7 +23,11 @@ interface GetManyBusinessesResponse {
   businesses: Business[];
 }
 
-interface PutBusinessRequest {
+interface CreateBusinessRequest {
+  name: string;
+}
+
+interface UpdateBusinessRequest {
   id: number;
   name: string;
 }
@@ -101,18 +105,11 @@ export class GrpcHandler {
 
   // Create a business
   createBusiness: UntypedHandleCall = async (
-    call: ServerUnaryCall<PutBusinessRequest, PutBusinessResponse>,
+    call: ServerUnaryCall<CreateBusinessRequest, PutBusinessResponse>,
     callback: sendUnaryData<PutBusinessResponse>
   ) => {
     try {
-      const { id, name } = call.request;
-
-      if (!id || id <= 0) {
-        return callback({
-          code: 3, // INVALID_ARGUMENT
-          message: "Invalid business ID"
-        });
-      }
+      const { name } = call.request;
 
       if (!name || name.trim().length === 0) {
         return callback({
@@ -121,7 +118,7 @@ export class GrpcHandler {
         });
       }
 
-      await this.controller.create(id, { id, name });
+      await this.controller.create(name);
 
       callback(null, { success: true });
     } catch (error) {
@@ -135,7 +132,7 @@ export class GrpcHandler {
 
   // Update a business
   updateBusiness: UntypedHandleCall = async (
-    call: ServerUnaryCall<PutBusinessRequest, PutBusinessResponse>,
+    call: ServerUnaryCall<UpdateBusinessRequest, PutBusinessResponse>,
     callback: sendUnaryData<PutBusinessResponse>
   ) => {
     try {

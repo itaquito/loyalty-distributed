@@ -40,7 +40,7 @@
       const response = await fetch(
         `${config.apiBaseUrl}/customer?id=${customer.id}`,
         {
-          method: "POST",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
@@ -86,21 +86,11 @@
     <Dialog.Header>
       <Dialog.Title>Edit Customer</Dialog.Title>
       <Dialog.Description>
-        Update customer information. Customer ID cannot be changed.
+        Update customer {customer.name}.
       </Dialog.Description>
     </Dialog.Header>
 
     <form onsubmit={handleSubmit} class="space-y-4">
-      <div class="space-y-2">
-        <Label.Root for="edit-id">Customer ID</Label.Root>
-        <Input.Root
-          id="edit-id"
-          type="number"
-          value={customer.id}
-          disabled
-        />
-      </div>
-
       <div class="space-y-2">
         <Label.Root for="edit-name">Name</Label.Root>
         <Input.Root

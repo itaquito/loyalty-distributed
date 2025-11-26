@@ -21,8 +21,8 @@ export class Controller {
     return await this.repository.getMany();
   }
 
-  async create(businessID: BusinessID, business: Business) {
-    return await this.repository.create(businessID, business);
+  async create(name: string) {
+    return await this.repository.create(name);
   }
 
   async update(businessID: BusinessID, business: Business) {

@@ -15,7 +15,6 @@
   let { open = $bindable(false), onOpenChange, onCustomerCreated }: Props = $props();
 
   let formData = $state({
-    id: "",
     name: "",
     businessID: "",
   });
@@ -26,7 +25,7 @@
   async function handleSubmit(e: Event) {
     e.preventDefault();
 
-    if (!formData.id || !formData.name || !formData.businessID) {
+    if (!formData.name || !formData.businessID) {
       error = "All fields are required";
       return;
     }
@@ -36,7 +35,7 @@
       error = null;
 
       const response = await fetch(
-        `${config.apiBaseUrl}/customer?id=${formData.id}`,
+        `${config.apiBaseUrl}/customer`,
         {
           method: "POST",
           headers: {
@@ -55,7 +54,7 @@
       }
 
       // Reset form
-      formData = { id: "", name: "", businessID: "" };
+      formData = { name: "", businessID: "" };
       open = false;
       onCustomerCreated?.();
     } catch (err) {
@@ -72,7 +71,7 @@
 
     if (!newOpen) {
       // Reset form when dialog closes
-      formData = { id: "", name: "", businessID: "" };
+      formData = { name: "", businessID: "" };
       error = null;
     }
   }
@@ -86,22 +85,11 @@
     <Dialog.Header>
       <Dialog.Title>Create New Customer</Dialog.Title>
       <Dialog.Description>
-        Add a new customer to the loyalty system. All fields are required.
+        Add a new customer to the loyalty system.
       </Dialog.Description>
     </Dialog.Header>
 
     <form onsubmit={handleSubmit} class="space-y-4">
-      <div class="space-y-2">
-        <Label.Root for="id">Customer ID</Label.Root>
-        <Input.Root
-          id="id"
-          type="number"
-          bind:value={formData.id}
-          placeholder="Enter customer ID"
-          required
-        />
-      </div>
-
       <div class="space-y-2">
         <Label.Root for="name">Name</Label.Root>
         <Input.Root

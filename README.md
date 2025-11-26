@@ -81,6 +81,9 @@ export DATABASE_URL="postgresql://loyalty_user:loyalty_pass@localhost:5432/loyal
 
 # Run migrations using npm
 npm run db:push
+
+# Seed the database
+npm run db:seed
 ```
 
 After migrations complete, stop the port-forward (Ctrl+C in the first terminal).

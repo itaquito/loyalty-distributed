@@ -28,14 +28,13 @@ export class Repository {
       .where(eq(transactions.customerID, customerID));
   }
 
-  async create(transactionID: TransactionID, transaction: Transaction): Promise<Transaction | undefined> {
+  async create(customerID: number, type: "DEPOSIT" | "WITHDRAWAL", quantity: number): Promise<Transaction | undefined> {
     const result = await db
       .insert(transactions)
       .values({
-        id: transactionID,
-        customerID: transaction.customerID,
-        type: transaction.type,
-        quantity: transaction.quantity,
+        customerID,
+        type,
+        quantity,
       })
       .returning();
 

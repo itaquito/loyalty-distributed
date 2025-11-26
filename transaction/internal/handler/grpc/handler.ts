@@ -33,7 +33,13 @@ interface GetTransactionsByCustomerIDResponse {
   transactions: Transaction[];
 }
 
-interface PutTransactionRequest {
+interface CreateTransactionRequest {
+  customer_id: number;
+  type: "TRANSACTION_TYPE_DEPOSIT" | "TRANSACTION_TYPE_WITHDRAWAL";
+  quantity: number;
+}
+
+interface UpdateTransactionRequest {
   id: number;
   customer_id: number;
   type: "TRANSACTION_TYPE_DEPOSIT" | "TRANSACTION_TYPE_WITHDRAWAL";
@@ -171,18 +177,11 @@ export class GrpcHandler {
 
   // Create a transaction
   createTransaction: UntypedHandleCall = async (
-    call: ServerUnaryCall<PutTransactionRequest, PutTransactionResponse>,
+    call: ServerUnaryCall<CreateTransactionRequest, PutTransactionResponse>,
     callback: sendUnaryData<PutTransactionResponse>
   ) => {
     try {
-      const { id, customer_id, type, quantity } = call.request;
-
-      if (!id || id <= 0) {
-        return callback({
-          code: 3, // INVALID_ARGUMENT
-          message: "Invalid transaction ID"
-        });
-      }
+      const { customer_id, type, quantity } = call.request;
 
       if (!customer_id || customer_id <= 0) {
         return callback({
@@ -205,12 +204,7 @@ export class GrpcHandler {
         });
       }
 
-      await this.controller.create(id, {
-        id,
-        customerID: customer_id,
-        type: fromProtoType(type),
-        quantity,
-      });
+      await this.controller.create(customer_id, fromProtoType(type), quantity);
 
       callback(null, { success: true });
     } catch (error) {
@@ -231,7 +225,7 @@ export class GrpcHandler {
 
   // Update a transaction
   updateTransaction: UntypedHandleCall = async (
-    call: ServerUnaryCall<PutTransactionRequest, PutTransactionResponse>,
+    call: ServerUnaryCall<UpdateTransactionRequest, PutTransactionResponse>,
     callback: sendUnaryData<PutTransactionResponse>
   ) => {
     try {

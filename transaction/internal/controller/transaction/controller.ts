@@ -29,11 +29,11 @@ export class Controller {
     return await this.repository.getByCustomerID(customerID);
   }
 
-  async create(transactionID: TransactionID, transaction: Transaction) {
-    const customer = await this.customerGateway.getCustomer(transaction.customerID);
+  async create(customerID: number, type: "DEPOSIT" | "WITHDRAWAL", quantity: number) {
+    const customer = await this.customerGateway.getCustomer(customerID);
     if (!customer) throw new CustomerNotFoundError();
 
-    return await this.repository.create(transactionID, transaction);
+    return await this.repository.create(customerID, type, quantity);
   }
 
   async update(transactionID: TransactionID, transaction: Transaction) {

@@ -20,13 +20,12 @@ export class Repository {
     return db.select().from(customers);
   }
 
-  async create(customerID: CustomerID, customer: Customer): Promise<Customer | undefined> {
+  async create(businessID: number, name: string): Promise<Customer | undefined> {
     const result = await db
       .insert(customers)
       .values({
-        id: customerID,
-        businessID: customer.businessID,
-        name: customer.name,
+        businessID,
+        name,
       })
       .returning();
 

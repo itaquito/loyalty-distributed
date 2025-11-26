@@ -32,11 +32,11 @@ export class Controller {
     return await this.repository.getMany();
   }
 
-  async create(customerID: CustomerID, customer: Customer) {
-    const business = await this.businessGateway.getBusiness(customer.businessID);
+  async create(businessID: number, name: string) {
+    const business = await this.businessGateway.getBusiness(businessID);
     if (!business) throw new BusinessNotFoundError();
 
-    return await this.repository.create(customerID, customer);
+    return await this.repository.create(businessID, name);
   }
 
   async update(customerID: CustomerID, customer: Customer) {
