@@ -37,6 +37,7 @@ app.get("/customer", (req, res) => handler.getCustomer(req, res));
 app.post("/customer", (req, res) => handler.createCustomer(req, res));
 app.put("/customer", (req, res) => handler.updateCustomer(req, res));
 app.delete("/customer", (req, res) => handler.deleteCustomer(req, res));
+app.post("/customer/transaction", (req, res) => handler.createTransaction(req, res));
 
 const server = app.listen(port, () => {
   console.log(`Customer HTTP server listening on port ${port}`);

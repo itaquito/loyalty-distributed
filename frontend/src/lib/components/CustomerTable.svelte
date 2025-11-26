@@ -3,7 +3,7 @@
 
   import { config } from "$lib/config";
 
-  import { Ellipsis, Pencil, Trash2 } from '@lucide/svelte';
+  import { Ellipsis, Pencil, Trash2, Plus } from '@lucide/svelte';
 
   import * as Table from "$lib/components/ui/table";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
@@ -11,6 +11,7 @@
 
   import CreateCustomerDialog from "./CreateCustomerDialog.svelte";
   import EditCustomerDialog from "./EditCustomerDialog.svelte";
+  import CreateTransactionDialog from "./CreateTransactionDialog.svelte";
   import CustomerBalance from "./CustomerBalance.svelte";
 
   async function fetchCustomers(): Promise<Customer[]> {
@@ -27,6 +28,8 @@
   let customersPromise = $state(fetchCustomers());
   let editingCustomer = $state<Customer | null>(null);
   let isEditDialogOpen = $state(false);
+  let transactionCustomer = $state<Customer | null>(null);
+  let isTransactionDialogOpen = $state(false);
 
   function refreshCustomers() {
     customersPromise = fetchCustomers();
@@ -35,6 +38,11 @@
   function handleEdit(customer: Customer) {
     editingCustomer = customer;
     isEditDialogOpen = true;
+  }
+
+  function handleCreateTransaction(customer: Customer) {
+    transactionCustomer = customer;
+    isTransactionDialogOpen = true;
   }
 
   async function handleDelete(customer: Customer) {
@@ -121,6 +129,11 @@
                   </DropdownMenu.Trigger>
 
                   <DropdownMenu.Content align="end">
+                    <DropdownMenu.Item onclick={() => handleCreateTransaction(customer)}>
+                      <Plus class="mr-2 h-4 w-4" />
+                      Add Transaction
+                    </DropdownMenu.Item>
+
                     <DropdownMenu.Item onclick={() => handleEdit(customer)}>
                       <Pencil class="mr-2 h-4 w-4" />
                       Edit
@@ -149,6 +162,15 @@
       customer={editingCustomer}
       bind:open={isEditDialogOpen}
       onCustomerUpdated={refreshCustomers}
+    />
+  {/if}
+
+  {#if transactionCustomer}
+    <CreateTransactionDialog
+      customerId={transactionCustomer.id}
+      customerName={transactionCustomer.name}
+      bind:open={isTransactionDialogOpen}
+      onTransactionCreated={refreshCustomers}
     />
   {/if}
 </div>

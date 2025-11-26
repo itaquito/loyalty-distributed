@@ -54,4 +54,13 @@ export class Controller {
 
     if (!wasDeleted) throw new NotFoundError()
   }
+
+  async createTransaction(customerID: CustomerID, type: "DEPOSIT" | "WITHDRAWAL", quantity: number) {
+    // Verify customer exists
+    const customer = await this.repository.get(customerID);
+    if (!customer) throw new NotFoundError();
+
+    // Create transaction via gateway
+    await this.transactionGateway.createTransaction(customerID, type, quantity);
+  }
 }

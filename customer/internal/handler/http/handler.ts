@@ -127,4 +127,36 @@ export class Handler {
       return res.status(500).send("Internal Server Error");
     }
   }
+
+  async createTransaction(req: Request, res: Response) {
+    try {
+      const rawID = req.query.id as string | undefined;
+      const customerID = CustomerIDSchema.parse(rawID ? parseInt(rawID) : null);
+
+      const { type, quantity } = req.body;
+
+      if (!type || (type !== "DEPOSIT" && type !== "WITHDRAWAL")) {
+        return res.status(400).send("Bad Request: type must be DEPOSIT or WITHDRAWAL");
+      }
+
+      if (typeof quantity !== 'number' || quantity <= 0) {
+        return res.status(400).send("Bad Request: quantity must be a positive number");
+      }
+
+      await this.controller.createTransaction(customerID, type, quantity);
+
+      return res.status(200).send("Success!");
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).send("Bad Request");
+      }
+
+      if (error instanceof NotFoundError) {
+        return res.status(404).send("Customer Not Found");
+      }
+
+      console.error(error);
+      return res.status(500).send("Internal Server Error");
+    }
+  }
 }
