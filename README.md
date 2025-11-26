@@ -21,6 +21,7 @@ kubectl cluster-info --context kind-loyalty-cluster
 docker build -t loyalty-business:latest -f business/Dockerfile .
 docker build -t loyalty-customer:latest -f customer/Dockerfile .
 docker build -t loyalty-transaction:latest -f transaction/Dockerfile .
+docker build -t loyalty-frontend:latest -f frontend/Dockerfile .
 ```
 
 ### Step 3: Load Images into Kind
@@ -31,6 +32,7 @@ Load the built images into the Kind cluster:
 kind load docker-image loyalty-business:latest --name loyalty-cluster
 kind load docker-image loyalty-customer:latest --name loyalty-cluster
 kind load docker-image loyalty-transaction:latest --name loyalty-cluster
+kind load docker-image loyalty-frontend:latest --name loyalty-cluster
 ```
 
 ### Step 4: Apply Kubernetes Configurations
@@ -97,6 +99,10 @@ kubectl apply -f k8s-configs/customer-service.yaml
 # Deploy transaction service
 kubectl apply -f k8s-configs/transaction-deployment.yaml
 kubectl apply -f k8s-configs/transaction-service.yaml
+
+# Deploy frontend
+kubectl apply -f k8s-configs/frontend-deployment.yaml
+kubectl apply -f k8s-configs/frontend-service.yaml
 ```
 
 **Alternative - Apply all at once:**
@@ -143,40 +149,46 @@ kubectl logs -n loyalty-services -l app=customer-service
 # Transaction service logs
 kubectl logs -n loyalty-services -l app=transaction-service
 
+# Frontend logs
+kubectl logs -n loyalty-services -l app=frontend
+
 # PostgreSQL logs
 kubectl logs -n loyalty-services -l app=postgres
 ```
 
-### Step 6: Test the Services
+### Step 6: Access the Services
+
+#### Option 1: Port-forward (works with any cluster)
 
 Port-forward to access the services locally:
 
 ```bash
-# Business service (in terminal 1)
-kubectl port-forward -n loyalty-services service/business-service 8002:8080
+# Frontend (in terminal 1)
+kubectl port-forward -n loyalty-services service/frontend 80:80
 
 # Customer service (in terminal 2)
-kubectl port-forward -n loyalty-services service/customer-service 8000:8080
-
-# Transaction service (in terminal 3)
-kubectl port-forward -n loyalty-services service/transaction-service 8001:8080
+kubectl port-forward -n loyalty-services service/customer-service 8080:8080
 ```
+
+Then access:
+- **Frontend**: http://localhost
+- **Customer API**: http://localhost:8080
 
 #### Test API Endpoints
 
 ```bash
 # Create a customer
-curl -X POST "http://localhost:8000/customer?id=1" \
+curl -X POST "http://localhost:8080/customer?id=1" \
   -H "Content-Type: application/json" \
   -d '{"businessID": 1, "name": "John Doe"}'
 
 # Get the customer (includes enriched business data and transactions via gRPC calls)
-curl "http://localhost:8000/customer?id=1"
+curl "http://localhost:8080/customer?id=1"
 ```
 
 ## Customer API Documentation
 
-The Customer service exposes a REST API on port 8000 (8080 in Kubernetes). All endpoints use the `/customer` path.
+The Customer service exposes a REST API on port 8080. All endpoints use the `/customer` path.
 
 ### Endpoints
 
@@ -186,7 +198,7 @@ Get all customers or a specific customer by ID.
 
 **Get All Customers:**
 ```bash
-curl "http://localhost:8000/customer"
+curl "http://localhost:8080/customer"
 ```
 
 **Response:** Array of customer objects
@@ -202,7 +214,7 @@ curl "http://localhost:8000/customer"
 
 **Get Specific Customer:**
 ```bash
-curl "http://localhost:8000/customer?id=1"
+curl "http://localhost:8080/customer?id=1"
 ```
 
 **Response:** Customer object enriched with business data and transactions (via gRPC calls to Business and Transaction services)
@@ -238,7 +250,7 @@ Create a new customer.
 
 **Request:**
 ```bash
-curl -X POST "http://localhost:8000/customer?id=1" \
+curl -X POST "http://localhost:8080/customer?id=1" \
   -H "Content-Type: application/json" \
   -d '{"businessID": 1, "name": "John Doe"}'
 ```
@@ -267,7 +279,7 @@ Update an existing customer.
 
 **Request:**
 ```bash
-curl -X PUT "http://localhost:8000/customer?id=1" \
+curl -X PUT "http://localhost:8080/customer?id=1" \
   -H "Content-Type: application/json" \
   -d '{"businessID": 1, "name": "Jane Doe"}'
 ```
@@ -297,7 +309,7 @@ Delete a customer.
 
 **Request:**
 ```bash
-curl -X DELETE "http://localhost:8000/customer?id=1"
+curl -X DELETE "http://localhost:8080/customer?id=1"
 ```
 
 **Query Parameters:**
