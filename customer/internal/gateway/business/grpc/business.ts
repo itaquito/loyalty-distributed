@@ -2,7 +2,7 @@ import type { BusinessID } from "@service/business/schema";
 import type { Business } from "@service/business/schema";
 
 import { credentials, Client } from "@grpc/grpc-js";
-import { Buffer } from "node:buffer";
+
 import { GatewayError } from "@service/customer/internal/gateway/error.js";
 
 // gRPC service definition matching business service

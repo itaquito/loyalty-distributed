@@ -2,17 +2,11 @@ FROM node:24-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json tsconfig.json ./
+# Copy everything
+COPY . .
 
 # Install all dependencies (including dev)
 RUN npm ci
-
-# Copy source code
-COPY db/ ./db/
-COPY business/ ./business/
-COPY customer/ ./customer/
-COPY transaction/ ./transaction/
 
 # Build TypeScript
 RUN npm run build

@@ -2,7 +2,7 @@ import type { CustomerID } from "@service/customer/schema";
 import type { Transaction } from "@service/transaction/schema";
 
 import { credentials, Client } from "@grpc/grpc-js";
-import { Buffer } from "node:buffer";
+
 import { GatewayError } from "@service/customer/internal/gateway/error.js";
 
 // gRPC service definition matching transaction service

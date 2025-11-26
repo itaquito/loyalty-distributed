@@ -1,7 +1,5 @@
 import type { ServiceDefinition } from "@grpc/grpc-js";
 
-import { Buffer } from "node:buffer";
-
 // Define the TransactionService without proto files
 export const TransactionServiceDefinition: ServiceDefinition = {
   GetTransaction: {

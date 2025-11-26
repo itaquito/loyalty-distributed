@@ -1,7 +1,5 @@
 import type { ServiceDefinition } from "@grpc/grpc-js";
 
-import { Buffer } from "node:buffer";
-
 // Define the BusinessService without proto files
 export const BusinessServiceDefinition: ServiceDefinition = {
   GetBusiness: {
