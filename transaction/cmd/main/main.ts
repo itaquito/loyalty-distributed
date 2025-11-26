@@ -7,7 +7,7 @@ import { CustomerGateway } from "../../internal/gateway/customer/http/customer.t
 import { GrpcHandler } from "../../internal/handler/grpc/handler.ts";
 import { TransactionServiceDefinition } from "../../internal/grpc/service.ts";
 
-const port = parseInt(Deno.env.get("PORT") || "8001");
+const port = parseInt(Deno.env.get("PORT") || "8000");
 
 // Initialize repository, controller, and handler
 const repository = new Repository();

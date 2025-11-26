@@ -20,11 +20,11 @@ spec:
         image: loyalty-transaction:latest
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 8080
-          name: http
+        - containerPort: 8000
+          name: grpc
         env:
         - name: PORT
-          value: "8080"
+          value: "8000"
         - name: DATABASE_URL
           value: "postgresql://loyalty_user:loyalty_pass@postgres:5432/loyalty"
         resources:

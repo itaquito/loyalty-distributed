@@ -41,7 +41,7 @@ function fromProtoType(type: "TRANSACTION_TYPE_DEPOSIT" | "TRANSACTION_TYPE_WITH
 export class TransactionGateway {
   private client: any;
 
-  constructor(serviceUrl = "transaction-service:8001") {
+  constructor(serviceUrl = "transaction-service:8000") {
     this.client = new Client(
       serviceUrl,
       credentials.createInsecure(),

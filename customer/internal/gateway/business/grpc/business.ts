@@ -29,7 +29,7 @@ interface GetBusinessResponse {
 export class BusinessGateway {
   private client: any;
 
-  constructor(serviceUrl = "business-service:8002") {
+  constructor(serviceUrl = "business-service:8000") {
     this.client = new Client(
       serviceUrl,
       credentials.createInsecure(),

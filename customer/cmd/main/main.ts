@@ -6,7 +6,7 @@ import { BusinessGateway } from "../../internal/gateway/business/grpc/business.t
 import { TransactionGateway } from "../../internal/gateway/transaction/grpc/transaction.ts";
 import { Handler } from "../../internal/handler/http/handler.ts";
 
-const port = parseInt(Deno.env.get("PORT") || "8000");
+const port = parseInt(Deno.env.get("PORT") || "8080");
 
 const repository = new Repository();
 const businessGateway = new BusinessGateway();

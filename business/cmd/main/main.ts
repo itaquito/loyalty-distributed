@@ -6,7 +6,7 @@ import { Controller } from "../../internal/controller/business/controller.ts";
 import { GrpcHandler } from "../../internal/handler/grpc/handler.ts";
 import { BusinessServiceDefinition } from "../../internal/grpc/service.ts";
 
-const port = parseInt(Deno.env.get("PORT") || "8002");
+const port = parseInt(Deno.env.get("PORT") || "8000");
 
 // Initialize repository, controller, and handler
 const repository = new Repository();
