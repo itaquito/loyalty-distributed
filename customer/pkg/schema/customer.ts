@@ -1,7 +1,7 @@
 import { pgTable, serial, text, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-import { businesses } from "@service/business/schema";
+import { businesses } from "../../../business/pkg/schema/business.ts";
 
 export const customers = pgTable("customers", {
   id: serial("id").primaryKey(),

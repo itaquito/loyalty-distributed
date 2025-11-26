@@ -1,7 +1,7 @@
 import { pgTable, serial, integer, text, pgEnum } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-import { customers } from "@service/customer/schema";
+import { customers } from "../../../customer/pkg/schema/customer.ts";
 
 // Define transaction type enum at database level
 export const transactionTypeEnum = pgEnum("transaction_type", ["DEPOSIT", "WITHDRAWAL"]);
