@@ -1,9 +1,9 @@
-import type { Controller } from "../../controller/business/controller.ts";
+import type { Controller } from "@service/business/internal/controller/business/controller.js";
 
 import { ZodError } from "zod";
 
-import { NotFoundError } from "../../controller/error.ts";
-import { BusinessIDSchema, BusinessSchema } from "../../../pkg/schema/business.ts";
+import { NotFoundError } from "@service/business/internal/controller/error.js";
+import { BusinessIDSchema, BusinessSchema } from "@service/business/schema";
 
 export class Handler {
   private controller: Controller;

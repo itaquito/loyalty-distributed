@@ -1,9 +1,9 @@
-import type { Controller } from "../../controller/transaction/controller.ts";
+import type { Controller } from "@service/transaction/internal/controller/transaction/controller.js";
 
 import { ZodError } from "zod";
 
-import { NotFoundError, CustomerNotFoundError } from "../../controller/error.ts";
-import { TransactionIDSchema, TransactionSchema } from "../../../pkg/schema/transaction.ts";
+import { NotFoundError, CustomerNotFoundError } from "@service/transaction/internal/controller/error.js";
+import { TransactionIDSchema, TransactionSchema } from "@service/transaction/schema";
 import { CustomerIDSchema } from "@service/customer/schema";
 
 export class Handler {

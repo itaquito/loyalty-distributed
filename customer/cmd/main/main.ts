@@ -1,12 +1,13 @@
+import express from "express";
 import { closeDatabase } from "@pkg/db";
 
-import { Repository } from "../../internal/repository/postgres/postgres.ts";
-import { Controller } from "../../internal/controller/customer/controller.ts";
-import { BusinessGateway } from "../../internal/gateway/business/grpc/business.ts";
-import { TransactionGateway } from "../../internal/gateway/transaction/grpc/transaction.ts";
-import { Handler } from "../../internal/handler/http/handler.ts";
+import { Repository } from "@service/customer/internal/repository/postgres/postgres.js";
+import { Controller } from "@service/customer/internal/controller/customer/controller.js";
+import { BusinessGateway } from "@service/customer/internal/gateway/business/grpc/business.js";
+import { TransactionGateway } from "@service/customer/internal/gateway/transaction/grpc/transaction.js";
+import { Handler } from "@service/customer/internal/handler/http/handler.js";
 
-const port = parseInt(Deno.env.get("PORT") || "8080");
+const port = parseInt(process.env.PORT || "8080");
 
 const repository = new Repository();
 const businessGateway = new BusinessGateway();
@@ -14,49 +15,26 @@ const transactionGateway = new TransactionGateway();
 const controller = new Controller(repository, businessGateway, transactionGateway);
 const handler = new Handler(controller);
 
-async function main(req: Request): Promise<Response> {
-  const url = new URL(req.url);
+const app = express();
+app.use(express.json());
 
-  if (url.pathname === "/customer") {
-    switch (req.method) {
-      case "GET":
-        return await handler.getCustomer(req);
+app.get("/customer", (req, res) => handler.getCustomer(req, res));
+app.post("/customer", (req, res) => handler.postCustomer(req, res));
+app.put("/customer", (req, res) => handler.postCustomer(req, res));
+app.delete("/customer", (req, res) => handler.deleteCustomer(req, res));
 
-      case "POST":
-        return await handler.postCustomer(req);
-
-      case "PUT":
-        return await handler.postCustomer(req);
-
-      case "DELETE":
-        return await handler.deleteCustomer(req);
-
-      default:
-        return new Response("Method Not Allowed", {
-          status: 405
-        });
-    }
-  }
-
-  return new Response("Not Found", {
-    status: 404
-  });
-}
-
-Deno.serve({ port }, main);
+const server = app.listen(port, () => {
+  console.log(`Customer HTTP server listening on port ${port}`);
+});
 
 async function handleShutdown() {
   console.log("Shutting down gracefully...");
+  server.close();
   businessGateway.close();
   transactionGateway.close();
   await closeDatabase();
-  Deno.exit();
+  process.exit(0);
 }
 
-Deno.addSignalListener("SIGINT", handleShutdown);
-
-if (Deno.build.os === "windows") {
-  Deno.addSignalListener("SIGBREAK", handleShutdown);
-} else {
-  Deno.addSignalListener("SIGTERM", handleShutdown);
-}
+process.on("SIGINT", handleShutdown);
+process.on("SIGTERM", handleShutdown);

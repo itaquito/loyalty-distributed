@@ -1,13 +1,13 @@
 import { closeDatabase } from "@pkg/db";
 import { Server, ServerCredentials } from "@grpc/grpc-js";
 
-import { Repository } from "../../internal/repository/postgres/postgres.ts";
-import { Controller } from "../../internal/controller/transaction/controller.ts";
-import { CustomerGateway } from "../../internal/gateway/customer/http/customer.ts";
-import { GrpcHandler } from "../../internal/handler/grpc/handler.ts";
-import { TransactionServiceDefinition } from "../../internal/grpc/service.ts";
+import { Repository } from "@service/transaction/internal/repository/postgres/postgres.js";
+import { Controller } from "@service/transaction/internal/controller/transaction/controller.js";
+import { CustomerGateway } from "@service/transaction/internal/gateway/customer/http/customer.js";
+import { GrpcHandler } from "@service/transaction/internal/handler/grpc/handler.js";
+import { TransactionServiceDefinition } from "@service/transaction/internal/grpc/service.js";
 
-const port = parseInt(Deno.env.get("PORT") || "8000");
+const port = parseInt(process.env.PORT || "8000");
 
 // Initialize repository, controller, and handler
 const repository = new Repository();
@@ -20,11 +20,11 @@ const server = new Server();
 
 // Add the TransactionService with all its methods
 server.addService(TransactionServiceDefinition, {
-  GetTransaction: grpcHandler.getTransaction,
-  GetManyTransactions: grpcHandler.getManyTransactions,
-  GetTransactionsByCustomerID: grpcHandler.getTransactionsByCustomerID,
-  PutTransaction: grpcHandler.putTransaction,
-  DeleteTransaction: grpcHandler.deleteTransaction,
+  GetTransaction: grpcHandler.getTransaction.bind(grpcHandler),
+  GetManyTransactions: grpcHandler.getManyTransactions.bind(grpcHandler),
+  GetTransactionsByCustomerID: grpcHandler.getTransactionsByCustomerID.bind(grpcHandler),
+  PutTransaction: grpcHandler.putTransaction.bind(grpcHandler),
+  DeleteTransaction: grpcHandler.deleteTransaction.bind(grpcHandler),
 });
 
 // Start the server
@@ -34,7 +34,7 @@ server.bindAsync(
   (err, boundPort) => {
     if (err) {
       console.error("Failed to start gRPC server:", err);
-      Deno.exit(1);
+      process.exit(1);
     }
 
     console.log(`Transaction gRPC server listening on port ${boundPort}`);
@@ -45,13 +45,8 @@ async function handleShutdown() {
   console.log("Shutting down gracefully...");
   server.forceShutdown();
   await closeDatabase();
-  Deno.exit();
+  process.exit(0);
 }
 
-Deno.addSignalListener("SIGINT", handleShutdown);
-
-if (Deno.build.os === "windows") {
-  Deno.addSignalListener("SIGBREAK", handleShutdown);
-} else {
-  Deno.addSignalListener("SIGTERM", handleShutdown);
-}
+process.on("SIGINT", handleShutdown);
+process.on("SIGTERM", handleShutdown);

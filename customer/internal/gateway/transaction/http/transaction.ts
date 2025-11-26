@@ -2,7 +2,7 @@ import type { CustomerID } from "@service/customer/schema";
 import type { Transaction } from "@service/transaction/schema";
 
 import { TransactionSchema } from "@service/transaction/schema";
-import { GatewayError } from "../../error.ts";
+import { GatewayError } from "@service/customer/internal/gateway/error.js";
 import { z } from "zod";
 
 export class TransactionGateway {

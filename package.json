@@ -1,0 +1,47 @@
+{
+  "name": "loyalty-distributed",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/itaquito/loyalty-distributed#readme",
+  "bugs": {
+    "url": "https://github.com/itaquito/loyalty-distributed/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itaquito/loyalty-distributed.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && tsc-alias",
+    "dev:business": "tsx watch business/cmd/main/main.ts",
+    "dev:customer": "tsx watch customer/cmd/main/main.ts",
+    "dev:transaction": "tsx watch transaction/cmd/main/main.ts",
+    "start:business": "node dist/business/cmd/main/main.js",
+    "start:customer": "node dist/customer/cmd/main/main.js",
+    "start:transaction": "node dist/transaction/cmd/main/main.js",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.1",
+    "drizzle-orm": "^0.44.7",
+    "drizzle-zod": "^0.8.3",
+    "express": "^5.1.0",
+    "pg": "^8.16.3",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.10.1",
+    "@types/pg": "^8.15.6",
+    "drizzle-kit": "^0.31.7",
+    "tsc-alias": "^1.8.16",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

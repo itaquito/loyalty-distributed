@@ -1,9 +1,10 @@
-import type { Controller } from "../../controller/customer/controller.ts";
+import type { Request, Response } from "express";
+import type { Controller } from "@service/customer/internal/controller/customer/controller.js";
 
 import { ZodError } from "zod";
 
-import { NotFoundError, BusinessNotFoundError } from "../../controller/error.ts";
-import { CustomerIDSchema, CustomerSchema } from "../../../pkg/schema/customer.ts";
+import { NotFoundError, BusinessNotFoundError } from "@service/customer/internal/controller/error.js";
+import { CustomerIDSchema, CustomerSchema } from "@service/customer/schema";
 
 export class Handler {
   private controller: Controller;
@@ -12,109 +13,81 @@ export class Handler {
     this.controller = controller;
   }
 
-  async getCustomer(req: Request) {
+  async getCustomer(req: Request, res: Response) {
     try {
-      const url = new URL(req.url);
-      const rawID = url.searchParams.get("id");
+      const rawID = req.query.id as string | undefined;
 
       // Get all customers
       if (!rawID) {
         const customers = await this.controller.getMany();
-
-        return new Response(JSON.stringify(customers), {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json"
-          },
-        });
+        return res.status(200).json(customers);
       }
 
       // Get specific customer
       const customerID = CustomerIDSchema.parse(parseInt(rawID));
       const customer = await this.controller.get(customerID);
 
-      return new Response(JSON.stringify(customer), {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json"
-        },
-      });
+      return res.status(200).json(customer);
     } catch (error) {
-      if (error instanceof ZodError) return new Response("Bad Request", {
-        status: 400
-      });
+      if (error instanceof ZodError) {
+        return res.status(400).send("Bad Request");
+      }
 
-      if (error instanceof NotFoundError) return new Response("Customer Not Found", {
-        status: 404
-      });
+      if (error instanceof NotFoundError) {
+        return res.status(404).send("Customer Not Found");
+      }
 
-      if (error instanceof BusinessNotFoundError) return new Response("Business Not Found", {
-        status: 404
-      });
+      if (error instanceof BusinessNotFoundError) {
+        return res.status(404).send("Business Not Found");
+      }
 
-      console.error(error)
-      return new Response("Internal Server Error", {
-        status: 500
-      });
+      console.error(error);
+      return res.status(500).send("Internal Server Error");
     }
   }
 
-  async postCustomer(req: Request) {
+  async postCustomer(req: Request, res: Response) {
     try {
-      const url = new URL(req.url);
-      const rawID = url.searchParams.get("id");
+      const rawID = req.query.id as string | undefined;
       const customerID = CustomerIDSchema.parse(rawID ? parseInt(rawID) : null);
-      const customer = CustomerSchema.parse(await req.json());
+      const customer = CustomerSchema.parse(req.body);
 
       await this.controller.put(customerID, customer);
 
-      return new Response("Success!", {
-        status: 200
-      });
+      return res.status(200).send("Success!");
     } catch (error) {
-      if (error instanceof SyntaxError) return new Response("Bad Request", {
-        status: 400
-      });
+      if (error instanceof ZodError) {
+        return res.status(400).send("Bad Request");
+      }
 
-      if (error instanceof ZodError) return new Response("Bad Request", {
-        status: 400
-      });
+      if (error instanceof BusinessNotFoundError) {
+        return res.status(404).send("Business Not Found");
+      }
 
-      if (error instanceof BusinessNotFoundError) return new Response("Business Not Found", {
-        status: 404
-      });
-
-      console.error(error)
-      return new Response("Internal Server Error", {
-        status: 500
-      });
+      console.error(error);
+      return res.status(500).send("Internal Server Error");
     }
   }
 
-  async deleteCustomer(req: Request) {
+  async deleteCustomer(req: Request, res: Response) {
     try {
-      const url = new URL(req.url);
-      const rawID = url.searchParams.get("id");
+      const rawID = req.query.id as string | undefined;
       const customerID = CustomerIDSchema.parse(rawID ? parseInt(rawID) : null);
 
       await this.controller.delete(customerID);
 
-      return new Response("Success!", {
-        status: 200
-      });
+      return res.status(200).send("Success!");
     } catch (error) {
-      if (error instanceof ZodError) return new Response("Bad Request", {
-        status: 400
-      });
+      if (error instanceof ZodError) {
+        return res.status(400).send("Bad Request");
+      }
 
-      if (error instanceof NotFoundError) return new Response("Customer Not Found", {
-        status: 404
-      });
+      if (error instanceof NotFoundError) {
+        return res.status(404).send("Customer Not Found");
+      }
 
-      console.error(error)
-      return new Response("Internal Server Error", {
-        status: 500
-      });
+      console.error(error);
+      return res.status(500).send("Internal Server Error");
     }
   }
 }

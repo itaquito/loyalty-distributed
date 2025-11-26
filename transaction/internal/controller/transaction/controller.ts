@@ -1,9 +1,9 @@
-import type { Repository } from "../../repository/postgres/postgres.ts";
-import type { Transaction, TransactionID } from "../../../pkg/schema/transaction.ts";
-import type { CustomerGateway } from "../../gateway/customer/http/customer.ts";
+import type { Repository } from "@service/transaction/internal/repository/postgres/postgres.js";
+import type { Transaction, TransactionID } from "@service/transaction/schema";
+import type { CustomerGateway } from "@service/transaction/internal/gateway/customer/http/customer.js";
 import type { CustomerID } from "@service/customer/schema";
 
-import { NotFoundError, CustomerNotFoundError } from "../error.ts";
+import { NotFoundError, CustomerNotFoundError } from "@service/transaction/internal/controller/error.js";
 
 export class Controller {
   private repository: Repository;

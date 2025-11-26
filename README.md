@@ -1,4 +1,6 @@
-## Step 1: Create Kind Cluster
+## Kubernetes Deployment
+
+### Step 1: Create Kind Cluster
 
 Create a new Kubernetes cluster using Kind:
 
@@ -12,9 +14,7 @@ Verify the cluster is running:
 kubectl cluster-info --context kind-loyalty-cluster
 ```
 
-## Step 2: Build Docker Images
-
-Build Docker images for all three services:
+### Step 2: Build Docker Images
 
 ```bash
 # Build from root context, specifying Dockerfile location
@@ -23,7 +23,7 @@ docker build -t loyalty-customer:latest -f customer/Dockerfile .
 docker build -t loyalty-transaction:latest -f transaction/Dockerfile .
 ```
 
-## Step 3: Load Images into Kind
+### Step 3: Load Images into Kind
 
 Load the built images into the Kind cluster:
 
@@ -33,23 +33,23 @@ kind load docker-image loyalty-customer:latest --name loyalty-cluster
 kind load docker-image loyalty-transaction:latest --name loyalty-cluster
 ```
 
-## Step 4: Apply Kubernetes Configurations
+### Step 4: Apply Kubernetes Configurations
 
 Apply the configurations in the correct order:
 
-### 4.1: Create Namespace
+#### 4.1: Create Namespace
 
 ```bash
 kubectl apply -f k8s-configs/namespace.yaml
 ```
 
-### 4.2: Create PersistentVolumeClaim
+#### 4.2: Create PersistentVolumeClaim
 
 ```bash
 kubectl apply -f k8s-configs/postgres-pvc.yaml
 ```
 
-### 4.3: Deploy PostgreSQL
+#### 4.3: Deploy PostgreSQL
 
 ```bash
 kubectl apply -f k8s-configs/postgres-deployment.yaml
@@ -62,7 +62,7 @@ Wait for PostgreSQL to be ready:
 kubectl wait --for=condition=ready pod -l app=postgres -n loyalty-services --timeout=120s
 ```
 
-### 4.4: Run Database Migrations
+#### 4.4: Run Database Migrations
 
 Port-forward to PostgreSQL to run migrations:
 
@@ -77,13 +77,13 @@ In another terminal, run migrations:
 # Set DATABASE_URL environment variable
 export DATABASE_URL="postgresql://loyalty_user:loyalty_pass@localhost:5432/loyalty"
 
-# Run migrations
-deno task db:push
+# Run migrations using npm
+npm run db:push
 ```
 
 After migrations complete, stop the port-forward (Ctrl+C in the first terminal).
 
-### 4.5: Deploy Microservices
+#### 4.5: Deploy Microservices
 
 ```bash
 # Deploy business service
@@ -105,7 +105,7 @@ kubectl apply -f k8s-configs/transaction-service.yaml
 kubectl apply -f k8s-configs/
 ```
 
-## Step 5: Verify Deployment
+### Step 5: Verify Deployment
 
 Check all resources in the namespace:
 
@@ -147,7 +147,7 @@ kubectl logs -n loyalty-services -l app=transaction-service
 kubectl logs -n loyalty-services -l app=postgres
 ```
 
-## Step 6: Test the Services
+### Step 6: Test the Services
 
 Port-forward to access the services locally:
 
@@ -162,36 +162,15 @@ kubectl port-forward -n loyalty-services service/customer-service 8000:8080
 kubectl port-forward -n loyalty-services service/transaction-service 8001:8080
 ```
 
-### Test API Endpoints
-
-In a new terminal, test the services:
+#### Test API Endpoints
 
 ```bash
-# Create a business
-curl -X POST "http://localhost:8002/business?id=1" \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Acme Corp"}'
-
-# Get the business
-curl "http://localhost:8002/business?id=1"
-
 # Create a customer
 curl -X POST "http://localhost:8000/customer?id=1" \
   -H "Content-Type: application/json" \
   -d '{"businessID": 1, "name": "John Doe"}'
 
-# Get the customer (includes business and transactions)
-curl "http://localhost:8000/customer?id=1"
-
-# Create a transaction
-curl -X POST "http://localhost:8001/transaction?id=1" \
-  -H "Content-Type: application/json" \
-  -d '{"customerID": 1, "type": "DEPOSIT", "quantity": 100}'
-
-# Get transactions for customer
-curl "http://localhost:8001/transaction?customerID=1"
-
-# Get the customer again (now with transactions)
+# Get the customer (includes enriched business data and transactions via gRPC calls)
 curl "http://localhost:8000/customer?id=1"
 ```
 

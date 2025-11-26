@@ -1,7 +1,7 @@
 import type { CustomerID } from "@service/customer/schema";
 
 import {  CustomerSchema } from "@service/customer/schema";
-import { GatewayError } from "../../error.ts";
+import { GatewayError } from "@service/transaction/internal/gateway/error.js";
 
 export class CustomerGateway {
   private serviceUrl: string;

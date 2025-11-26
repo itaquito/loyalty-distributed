@@ -1,13 +1,34 @@
-FROM denoland/deno:2.5.6
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
-COPY . .
+# Copy package files
+COPY package*.json tsconfig.json ./
 
-RUN deno install
+# Install all dependencies (including dev)
+RUN npm ci
+
+# Copy source code
+COPY db/ ./db/
+COPY business/ ./business/
+
+# Build TypeScript
+RUN npm run build
+
+# Production stage
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Copy package files and install production dependencies only
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+# Copy compiled code from builder
+COPY --from=builder /app/dist ./dist
 
 ENV PORT=8080
 
 EXPOSE $PORT
 
-CMD ["deno", "run", "--allow-net", "--allow-env", "business/cmd/main/main.ts"]
+CMD ["node", "dist/business/cmd/main/main.js"]

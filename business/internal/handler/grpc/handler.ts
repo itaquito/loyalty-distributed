@@ -1,7 +1,7 @@
 import type { ServerUnaryCall, sendUnaryData, UntypedHandleCall } from "@grpc/grpc-js";
 
-import type { Controller } from "../../controller/business/controller.ts";
-import { NotFoundError } from "../../controller/error.ts";
+import type { Controller } from "@service/business/internal/controller/business/controller.js";
+import { NotFoundError } from "@service/business/internal/controller/error.js";
 
 // Type definitions for our gRPC messages
 interface GetBusinessRequest {

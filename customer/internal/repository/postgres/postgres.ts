@@ -1,9 +1,9 @@
-import type { CustomerID, Customer } from "../../../pkg/schema/customer.ts";
+import type { CustomerID, Customer } from "@service/customer/schema";
 
 import { eq } from "drizzle-orm";
 import { db } from "@pkg/db";
 
-import { customers } from "../../../pkg/schema/customer.ts";
+import { customers } from "@service/customer/schema";
 
 export class Repository {
   async get(customerID: CustomerID): Promise<Customer | undefined> {
@@ -16,11 +16,11 @@ export class Repository {
     return result[0];
   }
 
-  async getMany(): Promise<Customer[]> {
-    return await db.select().from(customers);
+  getMany(): Promise<Customer[]> {
+    return db.select().from(customers);
   }
 
-  async put(customerID: CustomerID, customer: Customer): Promise<Customer> {
+  async put(customerID: CustomerID, customer: Customer): Promise<Customer | undefined> {
     const result = await db
       .insert(customers)
       .values({

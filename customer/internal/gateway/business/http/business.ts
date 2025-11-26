@@ -1,7 +1,7 @@
 import type { BusinessID } from "@service/business/schema";
 
 import { BusinessSchema } from "@service/business/schema";
-import { GatewayError } from "../../error.ts";
+import { GatewayError } from "@service/customer/internal/gateway/error.js";
 
 export class BusinessGateway {
   private serviceUrl: string;

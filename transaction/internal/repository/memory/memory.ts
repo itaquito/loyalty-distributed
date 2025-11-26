@@ -1,4 +1,4 @@
-import type { Transaction, TransactionID } from "../../../pkg/model/transaction.ts";
+import type { Transaction, TransactionID } from "@service/transaction/schema";
 
 export class Repository {
   private data: Map<TransactionID, Transaction> = new Map();

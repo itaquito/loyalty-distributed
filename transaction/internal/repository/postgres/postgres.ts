@@ -1,10 +1,10 @@
-import type { TransactionID, Transaction } from "../../../pkg/schema/transaction.ts";
+import type { TransactionID, Transaction } from "@service/transaction/schema";
 import type { CustomerID } from "@service/customer/schema";
 
 import { eq } from "drizzle-orm";
 import { db } from "@pkg/db";
 
-import { transactions } from "../../../pkg/schema/transaction.ts";
+import { transactions } from "@service/transaction/schema";
 
 export class Repository {
   async get(transactionID: TransactionID): Promise<Transaction | undefined> {
@@ -21,14 +21,14 @@ export class Repository {
     return await db.select().from(transactions);
   }
 
-  async getByCustomerID(customerID: CustomerID): Promise<Transaction[]> {
-    return await db
+   getByCustomerID(customerID: CustomerID): Promise<Transaction[]> {
+    return db
       .select()
       .from(transactions)
       .where(eq(transactions.customerID, customerID));
   }
 
-  async put(transactionID: TransactionID, transaction: Transaction): Promise<Transaction> {
+  async put(transactionID: TransactionID, transaction: Transaction): Promise<Transaction | undefined> {
     const result = await db
       .insert(transactions)
       .values({

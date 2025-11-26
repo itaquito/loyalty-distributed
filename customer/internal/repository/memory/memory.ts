@@ -1,4 +1,4 @@
-import type { CustomerID, Customer } from "../../../pkg/model/customer.ts";
+import type { CustomerID, Customer } from "@service/customer/schema";
 
 export class Repository {
   private data: Map<CustomerID, Customer> = new Map();

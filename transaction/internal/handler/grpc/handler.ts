@@ -1,7 +1,7 @@
 import type { ServerUnaryCall, sendUnaryData, UntypedHandleCall } from "@grpc/grpc-js";
 
-import type { Controller } from "../../controller/transaction/controller.ts";
-import { NotFoundError, CustomerNotFoundError } from "../../controller/error.ts";
+import type { Controller } from "@service/transaction/internal/controller/transaction/controller.js";
+import { NotFoundError, CustomerNotFoundError } from "@service/transaction/internal/controller/error.js";
 
 // Type definitions for our gRPC messages
 interface GetTransactionRequest {
