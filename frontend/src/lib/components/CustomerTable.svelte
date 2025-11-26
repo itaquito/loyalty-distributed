@@ -13,6 +13,7 @@
   import EditCustomerDialog from "./EditCustomerDialog.svelte";
   import CreateTransactionDialog from "./CreateTransactionDialog.svelte";
   import CustomerBalance from "./CustomerBalance.svelte";
+  import CustomerBusiness from "./CustomerBusiness.svelte";
 
   async function fetchCustomers(): Promise<Customer[]> {
     const response = await fetch(`${config.apiBaseUrl}/customer`);
@@ -107,7 +108,9 @@
 
               <Table.Cell>{customer.name}</Table.Cell>
 
-              <Table.Cell>{customer.business?.name ?? "N/A"}</Table.Cell>
+              <Table.Cell>
+                <CustomerBusiness customerId={customer.id} />
+              </Table.Cell>
 
               <Table.Cell>{customer.businessID}</Table.Cell>
 
