@@ -28,7 +28,7 @@ export class Repository {
       .where(eq(transactions.customerID, customerID));
   }
 
-  async put(transactionID: TransactionID, transaction: Transaction): Promise<Transaction | undefined> {
+  async create(transactionID: TransactionID, transaction: Transaction): Promise<Transaction | undefined> {
     const result = await db
       .insert(transactions)
       .values({
@@ -37,14 +37,20 @@ export class Repository {
         type: transaction.type,
         quantity: transaction.quantity,
       })
-      .onConflictDoUpdate({
-        target: transactions.id,
-        set: {
-          customerID: transaction.customerID,
-          type: transaction.type,
-          quantity: transaction.quantity,
-        },
+      .returning();
+
+    return result[0];
+  }
+
+  async update(transactionID: TransactionID, transaction: Transaction): Promise<Transaction | undefined> {
+    const result = await db
+      .update(transactions)
+      .set({
+        customerID: transaction.customerID,
+        type: transaction.type,
+        quantity: transaction.quantity,
       })
+      .where(eq(transactions.id, transactionID))
       .returning();
 
     return result[0];

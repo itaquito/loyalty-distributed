@@ -20,19 +20,25 @@ export class Repository {
     return db.select().from(businesses);
   }
 
-  async put(businessID: BusinessID, business: Business): Promise<Business | undefined> {
+  async create(businessID: BusinessID, business: Business): Promise<Business | undefined> {
     const result = await db
       .insert(businesses)
       .values({
         id: businessID,
         name: business.name,
       })
-      .onConflictDoUpdate({
-        target: businesses.id,
-        set: {
-          name: business.name,
-        },
+      .returning();
+
+    return result[0];
+  }
+
+  async update(businessID: BusinessID, business: Business): Promise<Business | undefined> {
+    const result = await db
+      .update(businesses)
+      .set({
+        name: business.name,
       })
+      .where(eq(businesses.id, businessID))
       .returning();
 
     return result[0];

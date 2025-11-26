@@ -32,11 +32,21 @@ export class Controller {
     return await this.repository.getMany();
   }
 
-  async put(customerID: CustomerID, customer: Customer) {
+  async create(customerID: CustomerID, customer: Customer) {
     const business = await this.businessGateway.getBusiness(customer.businessID);
     if (!business) throw new BusinessNotFoundError();
 
-    return await this.repository.put(customerID, customer);
+    return await this.repository.create(customerID, customer);
+  }
+
+  async update(customerID: CustomerID, customer: Customer) {
+    const existing = await this.repository.get(customerID);
+    if (!existing) throw new NotFoundError();
+
+    const business = await this.businessGateway.getBusiness(customer.businessID);
+    if (!business) throw new BusinessNotFoundError();
+
+    return await this.repository.update(customerID, customer);
   }
 
   async delete(customerID: CustomerID) {

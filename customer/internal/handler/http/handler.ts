@@ -46,18 +46,45 @@ export class Handler {
     }
   }
 
-  async postCustomer(req: Request, res: Response) {
+  async createCustomer(req: Request, res: Response) {
     try {
       const rawID = req.query.id as string | undefined;
       const customerID = CustomerIDSchema.parse(rawID ? parseInt(rawID) : null);
       const customer = CustomerSchema.parse(req.body);
 
-      await this.controller.put(customerID, customer);
+      await this.controller.create(customerID, customer);
 
       return res.status(200).send("Success!");
     } catch (error) {
       if (error instanceof ZodError) {
         return res.status(400).send("Bad Request");
+      }
+
+      if (error instanceof BusinessNotFoundError) {
+        return res.status(404).send("Business Not Found");
+      }
+
+      console.error(error);
+      return res.status(500).send("Internal Server Error");
+    }
+  }
+
+  async updateCustomer(req: Request, res: Response) {
+    try {
+      const rawID = req.query.id as string | undefined;
+      const customerID = CustomerIDSchema.parse(rawID ? parseInt(rawID) : null);
+      const customer = CustomerSchema.parse(req.body);
+
+      await this.controller.update(customerID, customer);
+
+      return res.status(200).send("Success!");
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).send("Bad Request");
+      }
+
+      if (error instanceof NotFoundError) {
+        return res.status(404).send("Customer Not Found");
       }
 
       if (error instanceof BusinessNotFoundError) {

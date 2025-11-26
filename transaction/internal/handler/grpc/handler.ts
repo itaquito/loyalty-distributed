@@ -169,8 +169,8 @@ export class GrpcHandler {
     }
   };
 
-  // Create or update a transaction
-  putTransaction: UntypedHandleCall = async (
+  // Create a transaction
+  createTransaction: UntypedHandleCall = async (
     call: ServerUnaryCall<PutTransactionRequest, PutTransactionResponse>,
     callback: sendUnaryData<PutTransactionResponse>
   ) => {
@@ -205,7 +205,7 @@ export class GrpcHandler {
         });
       }
 
-      await this.controller.put(id, {
+      await this.controller.create(id, {
         id,
         customerID: customer_id,
         type: fromProtoType(type),
@@ -221,7 +221,74 @@ export class GrpcHandler {
         });
       }
 
-      console.error("Error in putTransaction:", error);
+      console.error("Error in createTransaction:", error);
+      callback({
+        code: 13, // INTERNAL
+        message: "Internal server error"
+      });
+    }
+  };
+
+  // Update a transaction
+  updateTransaction: UntypedHandleCall = async (
+    call: ServerUnaryCall<PutTransactionRequest, PutTransactionResponse>,
+    callback: sendUnaryData<PutTransactionResponse>
+  ) => {
+    try {
+      const { id, customer_id, type, quantity } = call.request;
+
+      if (!id || id <= 0) {
+        return callback({
+          code: 3, // INVALID_ARGUMENT
+          message: "Invalid transaction ID"
+        });
+      }
+
+      if (!customer_id || customer_id <= 0) {
+        return callback({
+          code: 3, // INVALID_ARGUMENT
+          message: "Invalid customer ID"
+        });
+      }
+
+      if (!type || (type !== "TRANSACTION_TYPE_DEPOSIT" && type !== "TRANSACTION_TYPE_WITHDRAWAL")) {
+        return callback({
+          code: 3, // INVALID_ARGUMENT
+          message: "Invalid transaction type"
+        });
+      }
+
+      if (!quantity || quantity <= 0) {
+        return callback({
+          code: 3, // INVALID_ARGUMENT
+          message: "Quantity must be positive"
+        });
+      }
+
+      await this.controller.update(id, {
+        id,
+        customerID: customer_id,
+        type: fromProtoType(type),
+        quantity,
+      });
+
+      callback(null, { success: true });
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        return callback({
+          code: 5, // NOT_FOUND
+          message: "Transaction not found"
+        });
+      }
+
+      if (error instanceof CustomerNotFoundError) {
+        return callback({
+          code: 5, // NOT_FOUND
+          message: "Customer not found"
+        });
+      }
+
+      console.error("Error in updateTransaction:", error);
       callback({
         code: 13, // INTERNAL
         message: "Internal server error"

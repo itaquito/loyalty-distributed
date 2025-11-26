@@ -20,8 +20,17 @@ export const BusinessServiceDefinition: ServiceDefinition = {
     responseSerialize: (value: unknown) => Buffer.from(JSON.stringify(value)),
     responseDeserialize: (value: Buffer) => JSON.parse(value.toString()),
   },
-  PutBusiness: {
-    path: "/loyalty.v1.BusinessService/PutBusiness",
+  CreateBusiness: {
+    path: "/loyalty.v1.BusinessService/CreateBusiness",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: unknown) => Buffer.from(JSON.stringify(value)),
+    requestDeserialize: (value: Buffer) => JSON.parse(value.toString()),
+    responseSerialize: (value: unknown) => Buffer.from(JSON.stringify(value)),
+    responseDeserialize: (value: Buffer) => JSON.parse(value.toString()),
+  },
+  UpdateBusiness: {
+    path: "/loyalty.v1.BusinessService/UpdateBusiness",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: unknown) => Buffer.from(JSON.stringify(value)),

@@ -19,8 +19,8 @@ const app = express();
 app.use(express.json());
 
 app.get("/customer", (req, res) => handler.getCustomer(req, res));
-app.post("/customer", (req, res) => handler.postCustomer(req, res));
-app.put("/customer", (req, res) => handler.postCustomer(req, res));
+app.post("/customer", (req, res) => handler.createCustomer(req, res));
+app.put("/customer", (req, res) => handler.updateCustomer(req, res));
 app.delete("/customer", (req, res) => handler.deleteCustomer(req, res));
 
 const server = app.listen(port, () => {

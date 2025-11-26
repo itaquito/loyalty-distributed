@@ -20,7 +20,7 @@ export class Repository {
     return db.select().from(customers);
   }
 
-  async put(customerID: CustomerID, customer: Customer): Promise<Customer | undefined> {
+  async create(customerID: CustomerID, customer: Customer): Promise<Customer | undefined> {
     const result = await db
       .insert(customers)
       .values({
@@ -28,13 +28,19 @@ export class Repository {
         businessID: customer.businessID,
         name: customer.name,
       })
-      .onConflictDoUpdate({
-        target: customers.id,
-        set: {
-          businessID: customer.businessID,
-          name: customer.name,
-        },
+      .returning();
+
+    return result[0];
+  }
+
+  async update(customerID: CustomerID, customer: Customer): Promise<Customer | undefined> {
+    const result = await db
+      .update(customers)
+      .set({
+        businessID: customer.businessID,
+        name: customer.name,
       })
+      .where(eq(customers.id, customerID))
       .returning();
 
     return result[0];

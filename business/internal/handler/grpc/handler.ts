@@ -99,8 +99,8 @@ export class GrpcHandler {
     }
   };
 
-  // Create or update a business
-  putBusiness: UntypedHandleCall = async (
+  // Create a business
+  createBusiness: UntypedHandleCall = async (
     call: ServerUnaryCall<PutBusinessRequest, PutBusinessResponse>,
     callback: sendUnaryData<PutBusinessResponse>
   ) => {
@@ -121,11 +121,52 @@ export class GrpcHandler {
         });
       }
 
-      await this.controller.put(id, { id, name });
+      await this.controller.create(id, { id, name });
 
       callback(null, { success: true });
     } catch (error) {
-      console.error("Error in putBusiness:", error);
+      console.error("Error in createBusiness:", error);
+      callback({
+        code: 13, // INTERNAL
+        message: "Internal server error"
+      });
+    }
+  };
+
+  // Update a business
+  updateBusiness: UntypedHandleCall = async (
+    call: ServerUnaryCall<PutBusinessRequest, PutBusinessResponse>,
+    callback: sendUnaryData<PutBusinessResponse>
+  ) => {
+    try {
+      const { id, name } = call.request;
+
+      if (!id || id <= 0) {
+        return callback({
+          code: 3, // INVALID_ARGUMENT
+          message: "Invalid business ID"
+        });
+      }
+
+      if (!name || name.trim().length === 0) {
+        return callback({
+          code: 3, // INVALID_ARGUMENT
+          message: "Business name cannot be empty"
+        });
+      }
+
+      await this.controller.update(id, { id, name });
+
+      callback(null, { success: true });
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        return callback({
+          code: 5, // NOT_FOUND
+          message: "Business not found"
+        });
+      }
+
+      console.error("Error in updateBusiness:", error);
       callback({
         code: 13, // INTERNAL
         message: "Internal server error"

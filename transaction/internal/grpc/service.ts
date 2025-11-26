@@ -29,8 +29,17 @@ export const TransactionServiceDefinition: ServiceDefinition = {
     responseSerialize: (value: unknown) => Buffer.from(JSON.stringify(value)),
     responseDeserialize: (value: Buffer) => JSON.parse(value.toString()),
   },
-  PutTransaction: {
-    path: "/loyalty.v1.TransactionService/PutTransaction",
+  CreateTransaction: {
+    path: "/loyalty.v1.TransactionService/CreateTransaction",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: unknown) => Buffer.from(JSON.stringify(value)),
+    requestDeserialize: (value: Buffer) => JSON.parse(value.toString()),
+    responseSerialize: (value: unknown) => Buffer.from(JSON.stringify(value)),
+    responseDeserialize: (value: Buffer) => JSON.parse(value.toString()),
+  },
+  UpdateTransaction: {
+    path: "/loyalty.v1.TransactionService/UpdateTransaction",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: unknown) => Buffer.from(JSON.stringify(value)),

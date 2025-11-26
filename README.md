@@ -174,6 +174,149 @@ curl -X POST "http://localhost:8000/customer?id=1" \
 curl "http://localhost:8000/customer?id=1"
 ```
 
+## Customer API Documentation
+
+The Customer service exposes a REST API on port 8000 (8080 in Kubernetes). All endpoints use the `/customer` path.
+
+### Endpoints
+
+#### GET /customer
+
+Get all customers or a specific customer by ID.
+
+**Get All Customers:**
+```bash
+curl "http://localhost:8000/customer"
+```
+
+**Response:** Array of customer objects
+```json
+[
+  {
+    "id": 1,
+    "businessID": 1,
+    "name": "John Doe"
+  }
+]
+```
+
+**Get Specific Customer:**
+```bash
+curl "http://localhost:8000/customer?id=1"
+```
+
+**Response:** Customer object enriched with business data and transactions (via gRPC calls to Business and Transaction services)
+```json
+{
+  "id": 1,
+  "businessID": 1,
+  "name": "John Doe",
+  "business": {
+    "id": 1,
+    "name": "Acme Corp"
+  },
+  "transactions": [
+    {
+      "id": 1,
+      "customerID": 1,
+      "type": "DEPOSIT",
+      "quantity": 100
+    }
+  ]
+}
+```
+
+**Error Responses:**
+- `400 Bad Request` - Invalid customer ID
+- `404 Customer Not Found` - Customer does not exist
+- `404 Business Not Found` - Associated business does not exist
+- `500 Internal Server Error` - Server error
+
+#### POST /customer
+
+Create a new customer.
+
+**Request:**
+```bash
+curl -X POST "http://localhost:8000/customer?id=1" \
+  -H "Content-Type: application/json" \
+  -d '{"businessID": 1, "name": "John Doe"}'
+```
+
+**Query Parameters:**
+- `id` (required) - Customer ID (positive integer)
+
+**Request Body:**
+```json
+{
+  "businessID": 1,
+  "name": "John Doe"
+}
+```
+
+**Response:** `Success!` (200 OK)
+
+**Error Responses:**
+- `400 Bad Request` - Invalid request body or missing customer ID
+- `404 Business Not Found` - Referenced business does not exist
+- `500 Internal Server Error` - Server error
+
+#### PUT /customer
+
+Update an existing customer.
+
+**Request:**
+```bash
+curl -X PUT "http://localhost:8000/customer?id=1" \
+  -H "Content-Type: application/json" \
+  -d '{"businessID": 1, "name": "Jane Doe"}'
+```
+
+**Query Parameters:**
+- `id` (required) - Customer ID (positive integer)
+
+**Request Body:**
+```json
+{
+  "businessID": 1,
+  "name": "Jane Doe"
+}
+```
+
+**Response:** `Success!` (200 OK)
+
+**Error Responses:**
+- `400 Bad Request` - Invalid request body or missing customer ID
+- `404 Customer Not Found` - Customer does not exist
+- `404 Business Not Found` - Referenced business does not exist
+- `500 Internal Server Error` - Server error
+
+#### DELETE /customer
+
+Delete a customer.
+
+**Request:**
+```bash
+curl -X DELETE "http://localhost:8000/customer?id=1"
+```
+
+**Query Parameters:**
+- `id` (required) - Customer ID (positive integer)
+
+**Response:** `Success!` (200 OK)
+
+**Error Responses:**
+- `400 Bad Request` - Invalid or missing customer ID
+- `404 Customer Not Found` - Customer does not exist
+- `500 Internal Server Error` - Server error
+
+### Notes
+
+- The Customer service validates that the referenced `businessID` exists by making a gRPC call to the Business service during create and update operations
+- The GET endpoint for a specific customer enriches the response with business details and associated transactions via gRPC calls to the Business and Transaction services
+- All IDs must be positive integers
+- Customer names cannot be empty
+
 ## Cleanup
 
 ### Delete Kubernetes Resources

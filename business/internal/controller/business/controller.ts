@@ -21,8 +21,15 @@ export class Controller {
     return await this.repository.getMany();
   }
 
-  async put(businessID: BusinessID, business: Business) {
-    return await this.repository.put(businessID, business);
+  async create(businessID: BusinessID, business: Business) {
+    return await this.repository.create(businessID, business);
+  }
+
+  async update(businessID: BusinessID, business: Business) {
+    const existing = await this.repository.get(businessID);
+    if (!existing) throw new NotFoundError();
+
+    return await this.repository.update(businessID, business);
   }
 
   async delete(businessID: BusinessID) {

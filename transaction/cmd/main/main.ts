@@ -23,7 +23,8 @@ server.addService(TransactionServiceDefinition, {
   GetTransaction: grpcHandler.getTransaction.bind(grpcHandler),
   GetManyTransactions: grpcHandler.getManyTransactions.bind(grpcHandler),
   GetTransactionsByCustomerID: grpcHandler.getTransactionsByCustomerID.bind(grpcHandler),
-  PutTransaction: grpcHandler.putTransaction.bind(grpcHandler),
+  CreateTransaction: grpcHandler.createTransaction.bind(grpcHandler),
+  UpdateTransaction: grpcHandler.updateTransaction.bind(grpcHandler),
   DeleteTransaction: grpcHandler.deleteTransaction.bind(grpcHandler),
 });
 

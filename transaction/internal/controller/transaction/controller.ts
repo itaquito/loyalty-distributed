@@ -29,11 +29,21 @@ export class Controller {
     return await this.repository.getByCustomerID(customerID);
   }
 
-  async put(transactionID: TransactionID, transaction: Transaction) {
+  async create(transactionID: TransactionID, transaction: Transaction) {
     const customer = await this.customerGateway.getCustomer(transaction.customerID);
     if (!customer) throw new CustomerNotFoundError();
 
-    return await this.repository.put(transactionID, transaction);
+    return await this.repository.create(transactionID, transaction);
+  }
+
+  async update(transactionID: TransactionID, transaction: Transaction) {
+    const existing = await this.repository.get(transactionID);
+    if (!existing) throw new NotFoundError();
+
+    const customer = await this.customerGateway.getCustomer(transaction.customerID);
+    if (!customer) throw new CustomerNotFoundError();
+
+    return await this.repository.update(transactionID, transaction);
   }
 
   async delete(transactionID: TransactionID) {

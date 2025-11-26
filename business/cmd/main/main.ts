@@ -20,7 +20,8 @@ const server = new Server();
 server.addService(BusinessServiceDefinition, {
   GetBusiness: grpcHandler.getBusiness.bind(grpcHandler),
   GetManyBusinesses: grpcHandler.getManyBusinesses.bind(grpcHandler),
-  PutBusiness: grpcHandler.putBusiness.bind(grpcHandler),
+  CreateBusiness: grpcHandler.createBusiness.bind(grpcHandler),
+  UpdateBusiness: grpcHandler.updateBusiness.bind(grpcHandler),
   DeleteBusiness: grpcHandler.deleteBusiness.bind(grpcHandler),
 });
 
