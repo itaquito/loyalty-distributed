@@ -17,14 +17,10 @@ kubectl cluster-info --context kind-loyalty-cluster
 Build Docker images for all three services:
 
 ```bash
-# Build business service
-docker build -t loyalty-business:latest ./business
-
-# Build customer service
-docker build -t loyalty-customer:latest ./customer
-
-# Build transaction service
-docker build -t loyalty-transaction:latest ./transaction
+# Build from root context, specifying Dockerfile location
+docker build -t loyalty-business:latest -f business/Dockerfile .
+docker build -t loyalty-customer:latest -f customer/Dockerfile .
+docker build -t loyalty-transaction:latest -f transaction/Dockerfile .
 ```
 
 ## Step 3: Load Images into Kind
