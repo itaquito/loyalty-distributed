@@ -1,49 +1,49 @@
 import { closeDatabase } from "@pkg/db";
+import { Server, ServerCredentials } from "@grpc/grpc-js";
 
 import { Repository } from "../../internal/repository/postgres/postgres.ts";
 import { Controller } from "../../internal/controller/transaction/controller.ts";
 import { CustomerGateway } from "../../internal/gateway/customer/http/customer.ts";
-import { Handler } from "../../internal/handler/http/handler.ts";
+import { GrpcHandler } from "../../internal/handler/grpc/handler.ts";
+import { TransactionServiceDefinition } from "../../internal/grpc/service.ts";
 
-const port = parseInt(Deno.env.get("PORT") || "8080");
+const port = parseInt(Deno.env.get("PORT") || "8001");
 
+// Initialize repository, controller, and handler
 const repository = new Repository();
 const customerGateway = new CustomerGateway();
 const controller = new Controller(repository, customerGateway);
-const handler = new Handler(controller);
+const grpcHandler = new GrpcHandler(controller);
 
-async function main(req: Request): Promise<Response> {
-  const url = new URL(req.url);
+// Create gRPC server
+const server = new Server();
 
-  if (url.pathname === "/transaction") {
-    switch (req.method) {
-      case "GET":
-        return await handler.getTransaction(req);
+// Add the TransactionService with all its methods
+server.addService(TransactionServiceDefinition, {
+  GetTransaction: grpcHandler.getTransaction,
+  GetManyTransactions: grpcHandler.getManyTransactions,
+  GetTransactionsByCustomerID: grpcHandler.getTransactionsByCustomerID,
+  PutTransaction: grpcHandler.putTransaction,
+  DeleteTransaction: grpcHandler.deleteTransaction,
+});
 
-      case "POST":
-        return await handler.postTransaction(req);
-
-      case "PUT":
-        return await handler.postTransaction(req);
-
-      case "DELETE":
-        return await handler.deleteTransaction(req);
-
-      default:
-        return new Response("Method Not Allowed", {
-          status: 405
-        });
+// Start the server
+server.bindAsync(
+  `0.0.0.0:${port}`,
+  ServerCredentials.createInsecure(),
+  (err, boundPort) => {
+    if (err) {
+      console.error("Failed to start gRPC server:", err);
+      Deno.exit(1);
     }
+
+    console.log(`Transaction gRPC server listening on port ${boundPort}`);
   }
-
-  return new Response("Not Found", {
-    status: 404
-  });
-}
-
-Deno.serve({ port }, main);
+);
 
 async function handleShutdown() {
+  console.log("Shutting down gracefully...");
+  server.forceShutdown();
   await closeDatabase();
   Deno.exit();
 }

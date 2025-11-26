@@ -1,47 +1,46 @@
 import { closeDatabase } from "@pkg/db";
+import { Server, ServerCredentials } from "@grpc/grpc-js";
 
 import { Repository } from "../../internal/repository/postgres/postgres.ts";
 import { Controller } from "../../internal/controller/business/controller.ts";
-import { Handler } from "../../internal/handler/http/handler.ts";
+import { GrpcHandler } from "../../internal/handler/grpc/handler.ts";
+import { BusinessServiceDefinition } from "../../internal/grpc/service.ts";
 
-const port = parseInt(Deno.env.get("PORT") || "8080");
+const port = parseInt(Deno.env.get("PORT") || "8002");
 
+// Initialize repository, controller, and handler
 const repository = new Repository();
 const controller = new Controller(repository);
-const handler = new Handler(controller);
+const grpcHandler = new GrpcHandler(controller);
 
-async function main(req: Request): Promise<Response> {
-  const url = new URL(req.url);
+// Create gRPC server
+const server = new Server();
 
-  if (url.pathname === "/business") {
-    switch (req.method) {
-      case "GET":
-        return await handler.getBusiness(req);
+// Add the BusinessService with all its methods
+server.addService(BusinessServiceDefinition, {
+  GetBusiness: grpcHandler.getBusiness,
+  GetManyBusinesses: grpcHandler.getManyBusinesses,
+  PutBusiness: grpcHandler.putBusiness,
+  DeleteBusiness: grpcHandler.deleteBusiness,
+});
 
-      case "POST":
-        return await handler.postBusiness(req);
-
-      case "PUT":
-        return await handler.postBusiness(req);
-
-      case "DELETE":
-        return await handler.deleteBusiness(req);
-
-      default:
-        return new Response("Method Not Allowed", {
-          status: 405
-        });
+// Start the server
+server.bindAsync(
+  `0.0.0.0:${port}`,
+  ServerCredentials.createInsecure(),
+  (err, boundPort) => {
+    if (err) {
+      console.error("Failed to start gRPC server:", err);
+      Deno.exit(1);
     }
+
+    console.log(`Business gRPC server listening on port ${boundPort}`);
   }
-
-  return new Response("Not Found", {
-    status: 404
-  });
-}
-
-Deno.serve({ port }, main);
+);
 
 async function handleShutdown() {
+  console.log("Shutting down gracefully...");
+  server.forceShutdown();
   await closeDatabase();
   Deno.exit();
 }

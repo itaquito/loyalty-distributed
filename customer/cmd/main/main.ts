@@ -2,11 +2,11 @@ import { closeDatabase } from "@pkg/db";
 
 import { Repository } from "../../internal/repository/postgres/postgres.ts";
 import { Controller } from "../../internal/controller/customer/controller.ts";
-import { BusinessGateway } from "../../internal/gateway/business/http/business.ts";
-import { TransactionGateway } from "../../internal/gateway/transaction/http/transaction.ts";
+import { BusinessGateway } from "../../internal/gateway/business/grpc/business.ts";
+import { TransactionGateway } from "../../internal/gateway/transaction/grpc/transaction.ts";
 import { Handler } from "../../internal/handler/http/handler.ts";
 
-const port = parseInt(Deno.env.get("PORT") || "8080");
+const port = parseInt(Deno.env.get("PORT") || "8000");
 
 const repository = new Repository();
 const businessGateway = new BusinessGateway();
@@ -46,6 +46,9 @@ async function main(req: Request): Promise<Response> {
 Deno.serve({ port }, main);
 
 async function handleShutdown() {
+  console.log("Shutting down gracefully...");
+  businessGateway.close();
+  transactionGateway.close();
   await closeDatabase();
   Deno.exit();
 }

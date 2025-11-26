@@ -1,7 +1,7 @@
 import type { Repository } from "../../repository/postgres/postgres.ts";
 import type { Customer, CustomerID } from "../../../pkg/schema/customer.ts";
-import type { BusinessGateway } from "../../gateway/business/http/business.ts";
-import type { TransactionGateway } from "../../gateway/transaction/http/transaction.ts";
+import type { BusinessGateway } from "../../gateway/business/grpc/business.ts";
+import type { TransactionGateway } from "../../gateway/transaction/grpc/transaction.ts";
 
 import { NotFoundError, BusinessNotFoundError } from "../error.ts";
 
