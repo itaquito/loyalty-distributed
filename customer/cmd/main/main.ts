@@ -16,6 +16,21 @@ const controller = new Controller(repository, businessGateway, transactionGatewa
 const handler = new Handler(controller);
 
 const app = express();
+
+// Enable CORS for all origins
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  // Handle preflight requests
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
+
 app.use(express.json());
 
 app.get("/customer", (req, res) => handler.getCustomer(req, res));

@@ -1,3 +1,3 @@
 export const config = {
-  apiBaseUrl: "http://localhost:8080",
+  apiBaseUrl: "http://docker.itaqui.to:8080",
 } as const;

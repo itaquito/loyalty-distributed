@@ -158,21 +158,15 @@ kubectl logs -n loyalty-services -l app=postgres
 
 ### Step 6: Access the Services
 
-#### Option 1: Port-forward (works with any cluster)
-
 Port-forward to access the services locally:
 
 ```bash
 # Frontend (in terminal 1)
-kubectl port-forward -n loyalty-services service/frontend 80:80
+kubectl port-forward -n loyalty-services service/frontend --address 0.0.0.0 80:80
 
 # Customer service (in terminal 2)
-kubectl port-forward -n loyalty-services service/customer-service 8080:8080
+kubectl port-forward -n loyalty-services service/customer-service --address 0.0.0.0 8080:8080
 ```
-
-Then access:
-- **Frontend**: http://localhost
-- **Customer API**: http://localhost:8080
 
 #### Test API Endpoints
 
