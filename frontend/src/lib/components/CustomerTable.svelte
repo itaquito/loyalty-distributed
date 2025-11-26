@@ -11,6 +11,7 @@
 
   import CreateCustomerDialog from "./CreateCustomerDialog.svelte";
   import EditCustomerDialog from "./EditCustomerDialog.svelte";
+  import CustomerBalance from "./CustomerBalance.svelte";
 
   async function fetchCustomers(): Promise<Customer[]> {
     const response = await fetch(`${config.apiBaseUrl}/customer`);
@@ -29,16 +30,6 @@
 
   function refreshCustomers() {
     customersPromise = fetchCustomers();
-  }
-
-  function calculateBalance(transactions?: { type: string; quantity: number }[]): number {
-    if (!transactions || transactions.length === 0) return 0;
-
-    return transactions.reduce((acc, transaction) => {
-      return transaction.type === "DEPOSIT"
-        ? acc + transaction.quantity
-        : acc - transaction.quantity;
-    }, 0);
   }
 
   function handleEdit(customer: Customer) {
@@ -117,7 +108,7 @@
               </Table.Cell>
 
               <Table.Cell class="text-right">
-                {calculateBalance(customer.transactions)}
+                <CustomerBalance customerId={customer.id} />
               </Table.Cell>
 
               <Table.Cell>
