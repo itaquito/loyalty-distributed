@@ -3,7 +3,6 @@ import { Server, ServerCredentials } from "@grpc/grpc-js";
 
 import { Repository } from "@service/transaction/internal/repository/postgres/postgres.js";
 import { Controller } from "@service/transaction/internal/controller/transaction/controller.js";
-import { CustomerGateway } from "@service/transaction/internal/gateway/customer/http/customer.js";
 import { GrpcHandler } from "@service/transaction/internal/handler/grpc/handler.js";
 import { TransactionServiceDefinition } from "@service/transaction/internal/grpc/service.js";
 
@@ -11,8 +10,7 @@ const port = parseInt(process.env.PORT || "8000");
 
 // Initialize repository, controller, and handler
 const repository = new Repository();
-const customerGateway = new CustomerGateway();
-const controller = new Controller(repository, customerGateway);
+const controller = new Controller(repository);
 const grpcHandler = new GrpcHandler(controller);
 
 // Create gRPC server

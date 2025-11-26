@@ -1,17 +1,14 @@
 import type { Repository } from "@service/transaction/internal/repository/postgres/postgres.js";
 import type { Transaction, TransactionID } from "@service/transaction/schema";
-import type { CustomerGateway } from "@service/transaction/internal/gateway/customer/http/customer.js";
 import type { CustomerID } from "@service/customer/schema";
 
-import { NotFoundError, CustomerNotFoundError } from "@service/transaction/internal/controller/error.js";
+import { NotFoundError } from "@service/transaction/internal/controller/error.js";
 
 export class Controller {
   private repository: Repository;
-  private customerGateway: CustomerGateway;
 
-  constructor(repository: Repository, customerGateway: CustomerGateway) {
+  constructor(repository: Repository) {
     this.repository = repository;
-    this.customerGateway = customerGateway;
   }
 
   async get(transactionID: TransactionID) {
@@ -30,18 +27,12 @@ export class Controller {
   }
 
   async create(customerID: number, type: "DEPOSIT" | "WITHDRAWAL", quantity: number) {
-    const customer = await this.customerGateway.getCustomer(customerID);
-    if (!customer) throw new CustomerNotFoundError();
-
     return await this.repository.create(customerID, type, quantity);
   }
 
   async update(transactionID: TransactionID, transaction: Transaction) {
     const existing = await this.repository.get(transactionID);
     if (!existing) throw new NotFoundError();
-
-    const customer = await this.customerGateway.getCustomer(transaction.customerID);
-    if (!customer) throw new CustomerNotFoundError();
 
     return await this.repository.update(transactionID, transaction);
   }

@@ -7,15 +7,9 @@ export const businesses = pgTable("businesses", {
   name: text("name").notNull(),
 });
 
-// Drizzle types
-export type BusinessRow = typeof businesses.$inferSelect;
-export type NewBusiness = typeof businesses.$inferInsert;
-
 // Zod schemas generated from Drizzle
 export const BusinessSchema = createSelectSchema(businesses);
 export type Business = z.infer<typeof BusinessSchema>;
 
 export const BusinessIDSchema = z.number().positive();
 export type BusinessID = z.infer<typeof BusinessIDSchema>;
-
-export const NewBusinessSchema = createInsertSchema(businesses);

@@ -94,8 +94,6 @@
             <Table.Head class="w-[100px]">ID</Table.Head>
             <Table.Head>Name</Table.Head>
             <Table.Head>Business</Table.Head>
-            <Table.Head>Business ID</Table.Head>
-            <Table.Head class="text-right">Transactions</Table.Head>
             <Table.Head class="text-right">Balance</Table.Head>
             <Table.Head class="w-[50px]"></Table.Head>
           </Table.Row>
@@ -110,12 +108,6 @@
 
               <Table.Cell>
                 <CustomerBusiness customerId={customer.id} />
-              </Table.Cell>
-
-              <Table.Cell>{customer.businessID}</Table.Cell>
-
-              <Table.Cell class="text-right">
-                {customer.transactions?.length ?? 0}
               </Table.Cell>
 
               <Table.Cell class="text-right">

@@ -83,9 +83,22 @@ export class Handler {
     try {
       const rawID = req.query.id as string | undefined;
       const customerID = CustomerIDSchema.parse(rawID ? parseInt(rawID) : null);
-      const customer = CustomerSchema.parse(req.body);
 
-      await this.controller.update(customerID, customer);
+      const { businessID, name } = req.body;
+
+      if (!businessID || !name) {
+        return res.status(400).send("Bad Request: businessID and name are required");
+      }
+
+      if (typeof businessID !== 'number' || businessID <= 0) {
+        return res.status(400).send("Bad Request: businessID must be a positive number");
+      }
+
+      if (typeof name !== 'string' || name.trim().length === 0) {
+        return res.status(400).send("Bad Request: name cannot be empty");
+      }
+
+      await this.controller.update(customerID, { id: customerID, businessID, name });
 
       return res.status(200).send("Success!");
     } catch (error) {

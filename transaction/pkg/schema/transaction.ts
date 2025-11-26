@@ -1,5 +1,5 @@
-import { pgTable, serial, integer, text, pgEnum } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { pgTable, serial, integer, pgEnum } from "drizzle-orm/pg-core";
+import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 import { customers } from "@service/customer/schema";
 
@@ -13,17 +13,9 @@ export const transactions = pgTable("transactions", {
   quantity: integer("quantity").notNull(),
 });
 
-// Drizzle types
-export type TransactionRow = typeof transactions.$inferSelect;
-export type NewTransaction = typeof transactions.$inferInsert;
-
 // Zod schemas generated from Drizzle
 export const TransactionSchema = createSelectSchema(transactions);
 export type Transaction = z.infer<typeof TransactionSchema>;
 
 export const TransactionIDSchema = z.number().positive();
 export type TransactionID = z.infer<typeof TransactionIDSchema>;
-
-export const NewTransactionSchema = createInsertSchema(transactions, {
-  quantity: z.number().positive("Quantity must be positive"),
-});
