@@ -8,7 +8,7 @@
     "paths": {
       "@pkg/db": ["./db/db.ts"],
       "@service/business/*": ["./business/*"],
-      "@service/business/schema": ["./business/pkg/schema/bus3iness.ts"],
+      "@service/business/schema": ["./business/pkg/schema/business.ts"],
       "@service/customer/*": ["./customer/*"],
       "@service/customer/schema": ["./customer/pkg/schema/customer.ts"],
       "@service/transaction/*": ["./transaction/*"],
