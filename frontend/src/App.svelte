@@ -1,6 +1,8 @@
 <script lang="ts">
+  import CustomerTable from "$lib/components/CustomerTable.svelte";
 </script>
 
-<main>
-
+<main class="container mx-auto p-8">
+  <h1 class="text-3xl font-bold mb-6">Loyalty System - Customers</h1>
+  <CustomerTable />
 </main>
