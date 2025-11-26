@@ -10,4 +10,4 @@ ENV PORT=8080
 
 EXPOSE $PORT
 
-CMD ["deno", "run", "--allow-net", "--allow-env", "cmd/main/main.ts"]
+CMD ["deno", "run", "--allow-net", "--allow-env", "transaction/cmd/main/main.ts"]
